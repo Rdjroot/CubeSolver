@@ -68,9 +68,10 @@ void main() {
 	createTrackbar("cur color", "Trackbars", &COLOR_INT, 5);		// 檢測什麽顔色
 	createTrackbar("setup check color", "Trackbars", &check, 1);		// 檢測什麽顔色
 
+	// 切换六张图片，检验识别程度
 	while (true)
 	{
-		// 获取当前图片
+		// 获取当前图片(记得修改成你自己的路径)
 		string path = "Resources/" + colors[PIC_INT] + ".jpg";
 		// 代表当前检测什么颜色
 		string MASK_TITEL = colors[COLOR_INT];
