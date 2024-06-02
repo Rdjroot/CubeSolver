@@ -36,8 +36,17 @@ private:
 
     // 魔方信息识别对象
     cubeDetect *rcb;
-
+    // 存储魔方色块
     unordered_map<string, vector<string>> ruckCube;
+
+    vector<string> COLORS;
+
+    // OPENgl方块数据
+    float vertices[5184];
+    // 颜色与opengl颜色数据的映射表
+    unordered_map<string, vector<float>> openGLCubeColor;
+
+    unordered_map<string, vector<int>> tranIndex;
 
 private slots:
     // 打开识别窗口
@@ -48,8 +57,13 @@ private slots:
 
     // 处理一次传过来的数据
     void get_once_info(vector<string>);
+
 private:
     void changeBottonColor(const QString & buttonName, const QString & color);
+
+    void initVertices();
+
+    void initTransformForOpenGL();
 };
 
 
