@@ -62,7 +62,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>监控画面</string>
    </property>
    <property name="scaledContents">
     <bool>true</bool>

@@ -15,7 +15,6 @@
 #include<QMutex>
 
 using namespace std;
-using namespace cv;
 
 namespace Ui {
 class cubeDetect;
@@ -47,7 +46,7 @@ signals:
 private slots:
 
     // 识别画面获取魔方颜色
-    void dealImgInfo(Mat img);
+    void dealImgInfo(cv::Mat img);
 
     // 存储当前色面信息，并向主线程发送信号
     void on_saveButton_clicked();
@@ -59,7 +58,7 @@ private slots:
     void on_pauseButton_clicked();
 
     // 暂停画面展示
-    void pauseImg(Mat img);
+    void pauseImg(cv::Mat img);
 
 private:
     Ui::cubeDetect *ui;
@@ -71,7 +70,7 @@ private:
     CameraThread *camera_t;
 
     // 存储当前画面
-    Mat myImg;
+    cv::Mat myImg;
 
     // 互斥量，用于修改线程的信号传输标志位
     QMutex *mtx;
@@ -81,21 +80,21 @@ private:
     unordered_map<string, vector<string>> sixFaces;
 
     // 画面中的魔方识别框架
-    vector<Point> Frame;
+    vector<cv::Point> Frame;
 
     // 九个色块点位
-    vector<vector<Point>> ninePoints;
+    vector<vector<cv::Point>> ninePoints;
 
     // 六个颜色的HSV值
     vector<vector<int>> colorsHSV;
     // 用于画图的颜色
-    vector<Scalar> myColorValues;
+    vector<cv::Scalar> myColorValues;
     // 六个颜色名称对应
     unordered_map<int, string> colorMap;
 
 private:
     // 判断当前色块的颜色并返回
-    string getContours(Mat imgDil, const int colorInt, const int pos);
+    string getContours(cv::Mat imgDil, const int colorInt, const int pos);
     // mat转换为QImg，在label中展示
     void MatToQImage();
 };

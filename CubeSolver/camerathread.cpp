@@ -31,7 +31,7 @@ void CameraThread::stop()
 void CameraThread::run()
 {
     qDebug() << "run start!" ;
-    cap.open(0);
+    cap.open(1);            // 开启的摄像头序列号
     if(!cap.isOpened())
     {
         qDebug() <<" cap open is failed";
@@ -47,7 +47,7 @@ void CameraThread::run()
     * 将每一帧视频压缩为一个JPEG图像
     */
     cap.set(CV_CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
-    Mat frame;
+    cv::Mat frame;
     while(running)
     {
         cap.read(frame);

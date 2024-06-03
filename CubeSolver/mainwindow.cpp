@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , rcb(nullptr)
+    , bdc(nullptr)
 {
     this->setWindowIcon(QIcon(":/Resource/cubeIcon.png"));
 
@@ -18,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->yellow5->setStyleSheet("background-color: yellow");
 
     this->COLORS = {"blue","green","yellow","white","orange","red"};
+
+    ui->openGLWidget->hide();
 
     initTransformForOpenGL();
     initVertices();
@@ -390,7 +393,92 @@ void MainWindow::initTransformForOpenGL()
         {"orange",{4,7,1,3,5,6,8,0,2}},
         {"red",{4,7,1,5,3,8,6,2,0}}
     };
-};
+}
 
+void MainWindow::drawingCubeColor()
+{
+    this->cubeForGL = this->ruckCube;
+    // 修改map中的數據使其與渲染的順序一致
+    for(int i = 0; i < 6; i++)
+    {
+        string curFace = this->COLORS[i];
+        vector<int> trans = this->tranIndex[curFace];
+        for(int j = 0; j < 9; j++)
+        {
+            this->cubeForGL[curFace][j] = this->ruckCube[curFace][trans[j]];
+        }
+    }
 
+    int arrIndex = 0;
+    // 六面
+    for(int i = 0; i < 6; i++)
+    {
+        string curFace = this->COLORS[i];
+        vector<string> faceColors = this->cubeForGL[curFace];
+        // 九個方塊
+        for(int c = 0; c < 9; c++)
+        {
+            string curColor = faceColors[c];
+            vector<float> glColor = this->openGLCubeColor[curColor];
+            // 一個方塊需要四次渲染
+            for(int j = 0; j < 4; j++)
+            {
+                // 一次渲染需要三個數字
+                for(int k = 0; k < 3; k++)
+                {
+                    this->vertices[arrIndex+3+k] = glColor[k];
+                }
+                arrIndex += 6;
+            }
+        }
+    }
+}
 
+// 用于在主界面展示魔方时，隐藏按键
+void MainWindow::hideCubeButton()
+{
+    for(int i = 0; i < 6; i++)
+    {
+        for(int j = 1; j <= 9; j++)
+        {
+            QString buttonName = QString::fromStdString(this->COLORS[i]) + QString::number(i);
+            QPushButton *button = findChild<QPushButton *>(buttonName);
+            button->hide();
+        }
+    }
+}
+
+void MainWindow::on_constructButton_clicked()
+{
+    if(this->bdc == nullptr)
+    {
+//        ui->blue1->hide();
+//        hideCubeButton();
+        if(!this->ruckCube.empty())
+            drawingCubeColor();
+        bdc = new BuildCube(nullptr, this->vertices);
+        QVBoxLayout *layout = new QVBoxLayout();
+        layout->addWidget(bdc);
+
+        // 删除旧的布局（如果有）
+        if (ui->openGLWidget->layout() != nullptr)
+        {
+            QLayoutItem* item;
+            while ((item = ui->openGLWidget->layout()->takeAt(0)) != nullptr)
+            {
+                delete item->widget();
+                delete item;
+            }
+            delete ui->openGLWidget->layout();
+        }
+
+        ui->openGLWidget->setLayout(layout);
+
+        ui->openGLWidget->show();
+        bdc->setFocus();
+    }
+    else
+    {
+        qDebug() << "is cubeForGL empty? " << this->cubeForGL.empty() << endl;
+    }
+}

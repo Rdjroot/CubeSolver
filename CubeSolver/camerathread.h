@@ -13,7 +13,6 @@
 #include<QThread>
 
 using namespace std;
-using namespace cv;
 
 class CameraThread : public QThread
 {
@@ -27,8 +26,8 @@ public:
 
 signals:
     // 控制显示的画面
-    void frameReady(const Mat &frame);
-    void framePause(const Mat &frame);
+    void frameReady(const cv::Mat &frame);
+    void framePause(const cv::Mat &frame);
 
 protected:
     // 函数重载，线程运行
@@ -38,7 +37,7 @@ private:
     // 程序运行状态位
     bool running;
 
-    VideoCapture cap;
+    cv::VideoCapture cap;
     // 该信号用于决定，画面是继续分析，还是暂停处理
     bool flag;
 

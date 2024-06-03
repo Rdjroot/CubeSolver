@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>Resource/cubeIcon.png</file>
+        <file>shapes.frag</file>
+        <file>shapes.vert</file>
     </qresource>
 </RCC>

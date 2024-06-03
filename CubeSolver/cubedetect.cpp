@@ -19,7 +19,7 @@ cubeDetect::cubeDetect(QWidget *parent) :
 //    qDebug() << "cubeDetect constructor";
 
     // 注册 Mat 类型
-    qRegisterMetaType<Mat>("Mat");
+    qRegisterMetaType<cv::Mat>("cv::Mat");
 
     // 获取摄像机画面并展示
     connect(camera_t, &CameraThread::frameReady, this, &cubeDetect::dealImgInfo);
@@ -74,7 +74,7 @@ cubeDetect::~cubeDetect()
     delete ui;
 }
 
-void cubeDetect::dealImgInfo(Mat img)
+void cubeDetect::dealImgInfo(cv::Mat img)
 {
     if(img.empty())
     {
@@ -85,22 +85,22 @@ void cubeDetect::dealImgInfo(Mat img)
     this->myImg = img;
 
     // 描绘识别框
-    rectangle(this->myImg, Frame[0], Frame[1], Scalar(255, 255,255), 2);
-    Mat divCube,divHSV;
+    cv::rectangle(this->myImg, Frame[0], Frame[1], cv::Scalar(255, 255,255), 2);
+    cv::Mat divCube,divHSV;
     vector<string> temp;
 
     // 魔方一面的九个色块识别
     for (int i = 0; i < 9; i++)
     {
         // 裁剪色块
-        Rect roi(ninePoints[i][0],ninePoints[i][1]);
+        cv::Rect roi(ninePoints[i][0],ninePoints[i][1]);
         divCube = this->myImg(roi);
-        cvtColor(divCube, divHSV, COLOR_BGR2HSV);
+        cv::cvtColor(divCube, divHSV, cv::COLOR_BGR2HSV);
         // 定义的六种颜色将会被识别
         for (int j = 0; j < colorsHSV.size(); j++) {
-            Scalar lower(colorsHSV[j][0], colorsHSV[j][2], colorsHSV[j][4]);
-            Scalar upper(colorsHSV[j][1], colorsHSV[j][3], colorsHSV[j][5]);
-            Mat mask;
+            cv::Scalar lower(colorsHSV[j][0], colorsHSV[j][2], colorsHSV[j][4]);
+            cv::Scalar upper(colorsHSV[j][1], colorsHSV[j][3], colorsHSV[j][5]);
+            cv::Mat mask;
             // 匹配颜色，将会是白色块，其余是黑色
             inRange(divHSV, lower, upper, mask);
 
@@ -162,26 +162,26 @@ void cubeDetect::on_pauseButton_clicked()
 }
 
 // 暂停的画面展示
-void cubeDetect::pauseImg(Mat img)
+void cubeDetect::pauseImg(cv::Mat img)
 {
-     circle(myImg, Point(400, 50), 20, Scalar(0, 0, 255),FILLED);
+     cv::circle(myImg, cv::Point(400, 50), 20, cv::Scalar(0, 0, 255),cv::FILLED);
      MatToQImage();
 }
 
 // 获取当前色块颜色
-string cubeDetect::getContours(Mat imgDil, const int colorInt, const int pos)
+string cubeDetect::getContours(cv::Mat imgDil, const int colorInt, const int pos)
 {
-    vector<vector<Point>> contours;
-    vector<Vec4i> hierarchy;
+    vector<vector<cv::Point>> contours;
+    vector<cv::Vec4i> hierarchy;
 
     // 根据二值图勾勒轮廓
-    findContours(imgDil, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    cv::findContours(imgDil, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     // 如果有轮廓，代表颜色对上了
     if (!contours.empty())
     {
         // 描绘对应的颜色识别框，表示当前识别出来是什么颜色
-        rectangle(this->myImg, ninePoints[pos][0], ninePoints[pos][1], Scalar(myColorValues[colorInt]), 2);
+        cv::rectangle(this->myImg, ninePoints[pos][0], ninePoints[pos][1], cv::Scalar(myColorValues[colorInt]), 2);
         return colorMap[colorInt];
     }
     return "";
@@ -190,12 +190,12 @@ string cubeDetect::getContours(Mat imgDil, const int colorInt, const int pos)
 // Mat 转QImgae 类型在label展示摄像头画面
 void cubeDetect::MatToQImage()
 {
-    Mat rgb;
+    cv::Mat rgb;
     QImage img;
     try{
         if(this->myImg.channels() == 3)
         {
-            cvtColor(this->myImg, rgb, CV_BGR2RGB);
+            cv::cvtColor(this->myImg, rgb, CV_BGR2RGB);
             img = QImage((const uchar*)(rgb.data), rgb.cols, rgb.rows, rgb.cols * rgb.channels(), QImage::Format_RGB888);
         }
         else

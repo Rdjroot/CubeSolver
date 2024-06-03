@@ -49,3 +49,34 @@
 
 <center>效果展示</center>
 
+#### 05.31
+
+工作内容：实现还原算法；可输入打乱公式，获取还原公式
+
+还原算法的demo：/Code/algorithm/Cube_Algorithm
+
+- CubieCube.h/cpp：魔方数据结构与旋转方法
+- Solver.h/Solver.cpp: 还原算法
+- testMain.cpp: 测试代码
+
+![image-20240603233400048](https://raw.githubusercontent.com/Rdjroot/Img_beds/master/img/202406032334158.png)
+
+<center>效果展示</center>
+
+#### 06.03
+
+工作内容：充实QT界面，实现魔方3D图像展示构建
+
+![image-20240603233631456](https://raw.githubusercontent.com/Rdjroot/Img_beds/master/img/202406032336507.png)
+
+<center>开始界面</center>
+
+<img src="https://raw.githubusercontent.com/Rdjroot/Img_beds/master/img/202406032344444.png" alt="image-20240603234402371" style="zoom:67%;" />
+
+<center>识别结果</center>
+
+<img src="https://raw.githubusercontent.com/Rdjroot/Img_beds/master/img/202406032356179.png" alt="image-20240603235650137" style="zoom:67%;" />
+
+<img src="https://raw.githubusercontent.com/Rdjroot/Img_beds/master/img/202406032358331.png" alt="image-20240603235833288" style="zoom:67%;" />
+
+<center>按照识别结果展示</center>

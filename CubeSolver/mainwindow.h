@@ -11,17 +11,17 @@
 #include<vector>
 #include<unordered_map>
 #include<string>
-
+#include "buildcube.h"
+#include<QVBoxLayout>
 
 using namespace std;
-
-using namespace cv;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 class cubeDetect;
+class BuildCube;
 
 class MainWindow : public QMainWindow
 {
@@ -36,8 +36,12 @@ private:
 
     // 魔方信息识别对象
     cubeDetect *rcb;
+    BuildCube *bdc;
+
+    // opengl 魔方展示對象
     // 存储魔方色块
     unordered_map<string, vector<string>> ruckCube;
+    unordered_map<string, vector<string>> cubeForGL;
 
     vector<string> COLORS;
 
@@ -58,13 +62,18 @@ private slots:
     // 处理一次传过来的数据
     void get_once_info(vector<string>);
 
+    void on_constructButton_clicked();
+
 private:
     void changeBottonColor(const QString & buttonName, const QString & color);
 
     void initVertices();
 
     void initTransformForOpenGL();
-};
 
+    void drawingCubeColor();
+
+    void hideCubeButton();
+};
 
 #endif // MAINWINDOW_H
