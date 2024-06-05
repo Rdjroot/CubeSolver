@@ -12,7 +12,9 @@
 #include<unordered_map>
 #include<string>
 #include "buildcube.h"
+#include<QCloseEvent>
 #include<QVBoxLayout>
+#include "solver.h"
 
 using namespace std;
 
@@ -22,6 +24,7 @@ QT_END_NAMESPACE
 
 class cubeDetect;
 class BuildCube;
+class Solver;
 
 class MainWindow : public QMainWindow
 {
@@ -36,7 +39,12 @@ private:
 
     // 魔方信息识别对象
     cubeDetect *rcb;
+
+    // 构建3D魔方
     BuildCube *bdc;
+
+    // 求解
+    Solver* solver;
 
     // opengl 魔方展示對象
     // 存储魔方色块
@@ -73,7 +81,12 @@ private:
 
     void drawingCubeColor();
 
-    void hideCubeButton();
+protected:
+    void closeEvent(QCloseEvent *event) override;
+
+signals:
+    void ExitWin();
+
 };
 
 #endif // MAINWINDOW_H

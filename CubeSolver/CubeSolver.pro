@@ -12,15 +12,19 @@ SOURCES += \
     buildcube.cpp \
     camerathread.cpp \
     cubedetect.cpp \
+    cubiecube.cpp \
     main.cpp \
     mainwindow.cpp \
+    solver.cpp \
     welcome.cpp
 
 HEADERS += \
     buildcube.h \
     camerathread.h \
     cubedetect.h \
+    cubiecube.h \
     mainwindow.h \
+    solver.h \
     welcome.h
 
 FORMS += \

@@ -7,9 +7,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , rcb(nullptr)
     , bdc(nullptr)
+    , solver(nullptr)
 {
     this->setWindowIcon(QIcon(":/Resource/cubeIcon.png"));
-
+    this->setWindowTitle("CubeSolver");
     ui->setupUi(this);
     ui->blue5->setStyleSheet("background-color: blue");
     ui->white5->setStyleSheet("background-color: white");
@@ -33,6 +34,11 @@ MainWindow::~MainWindow()
         rcb->close();
         rcb->deleteLater();
     }
+    if(bdc != nullptr)
+    {
+        delete bdc;
+    }
+    emit ExitWin();
     delete ui;
 }
 
@@ -70,11 +76,12 @@ void MainWindow::get_once_info(vector<string> infos)
     {
         QString buttonName = faceCenter + QString::number(i);
         QString color = QString::fromStdString(infos[i-1]);
-        qDebug() <<"color not found: " << color;
+//        qDebug() <<"color not found: " << color;
         changeBottonColor(buttonName, color);
     }
 }
 
+// 改变button的颜色，代表识别出的颜色
 void MainWindow::changeBottonColor(const QString &buttonName, const QString &color)
 {
     QPushButton *button = findChild<QPushButton *>(buttonName);
@@ -89,6 +96,7 @@ void MainWindow::changeBottonColor(const QString &buttonName, const QString &col
     }
 }
 
+// 初始化图像数组
 void MainWindow::initVertices()
 {
     float arr[] = {
@@ -376,6 +384,7 @@ void MainWindow::initVertices()
     }
 }
 
+// 颜色变换数组
 void MainWindow::initTransformForOpenGL()
 {
     this->openGLCubeColor = {{"blue", {0.0f, 0.0f, 1.0f}},
@@ -395,6 +404,7 @@ void MainWindow::initTransformForOpenGL()
     };
 }
 
+// 修改map中的數據使其與渲染的順序一致
 void MainWindow::drawingCubeColor()
 {
     this->cubeForGL = this->ruckCube;
@@ -434,26 +444,11 @@ void MainWindow::drawingCubeColor()
     }
 }
 
-// 用于在主界面展示魔方时，隐藏按键
-void MainWindow::hideCubeButton()
-{
-    for(int i = 0; i < 6; i++)
-    {
-        for(int j = 1; j <= 9; j++)
-        {
-            QString buttonName = QString::fromStdString(this->COLORS[i]) + QString::number(i);
-            QPushButton *button = findChild<QPushButton *>(buttonName);
-            button->hide();
-        }
-    }
-}
-
+// 展示3D魔方
 void MainWindow::on_constructButton_clicked()
 {
     if(this->bdc == nullptr)
     {
-//        ui->blue1->hide();
-//        hideCubeButton();
         if(!this->ruckCube.empty())
             drawingCubeColor();
         bdc = new BuildCube(nullptr, this->vertices);
@@ -481,4 +476,9 @@ void MainWindow::on_constructButton_clicked()
     {
         qDebug() << "is cubeForGL empty? " << this->cubeForGL.empty() << endl;
     }
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    emit ExitWin();
 }

@@ -24,6 +24,7 @@ class cubeDetect;
 // 前向声明
 class MainWindow;
 
+// 魔方色块图像识别
 class cubeDetect : public QWidget
 {
     Q_OBJECT

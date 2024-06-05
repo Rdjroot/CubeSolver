@@ -80,7 +80,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="scanUsing">
    <property name="geometry">
     <rect>
      <x>500</x>
@@ -93,7 +93,7 @@ p, li { white-space: pre-wrap; }
     <string>扫描使用</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit">
+  <widget class="QLineEdit" name="latexInput">
    <property name="geometry">
     <rect>
      <x>40</x>
@@ -119,7 +119,7 @@ p, li { white-space: pre-wrap; }
     <string>打乱公式</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_2">
+  <widget class="QLineEdit" name="latexOutput">
    <property name="geometry">
     <rect>
      <x>40</x>

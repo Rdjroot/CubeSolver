@@ -21,6 +21,7 @@ QT_END_NAMESPACE
 class QOpenGLShaderProgram;
 class QOpenGLTexture;
 
+// 构造魔方3D图像展示
 class BuildCube : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
