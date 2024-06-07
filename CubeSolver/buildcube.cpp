@@ -125,6 +125,7 @@ void BuildCube::paintGL()
 
 void BuildCube::resizeGL(int, int){}
 
+/*
 void BuildCube::keyPressEvent(QKeyEvent *event)
 {
     if(m_key == -794){//防止点击过快
@@ -156,6 +157,7 @@ void BuildCube::keyPressEvent(QKeyEvent *event)
     }
     QOpenGLWidget::keyPressEvent(event);
 }
+
 
 void BuildCube::timerEvent(QTimerEvent *event)
 {
@@ -270,4 +272,161 @@ void BuildCube::timerEvent(QTimerEvent *event)
         m_anti = 1;
         killTimer(event->timerId());
     }
+}
+
+*/
+
+void BuildCube::rotateCube(QString mv)
+{
+    cout <<" receive ok" <<endl;
+    commandQueue.enqueue(mv);
+
+    if(m_command.isEmpty())
+    {
+        processNextCommand();
+    }
+}
+
+
+void BuildCube::timerEvent(QTimerEvent *event)
+{
+    QThread::msleep(80);
+    cout << "timeevent is start!" <<endl;
+    static int m_count = 0;
+    m_count++;
+    if(m_command.contains("R"))
+    {
+        emit sendMoveLabel(m_command);
+        for(auto x: qAsConst(ans)){
+            QMatrix4x4 tmp;
+            // m_anti 控制方向
+            tmp.rotate(-10*m_anti, 1.0f, 0.0f, 0.0f);
+            matrix[x] = tmp * matrix[x];
+        }
+    }else if(m_command.contains("L"))
+    {
+        emit sendMoveLabel(m_command);
+        for(auto x: qAsConst(ans)){
+            QMatrix4x4 tmp;
+            tmp.rotate(10*m_anti, 1.0f, 0.0f, 0.0f);
+            matrix[x] = tmp * matrix[x];
+        }
+    }else if(m_command.contains("U"))
+    {
+        emit sendMoveLabel(m_command);
+        for(auto x: qAsConst(ans)){
+            QMatrix4x4 tmp;
+            tmp.rotate(-10*m_anti, 0.0f, 1.0f, 0.0f);
+            matrix[x] = tmp * matrix[x];
+        }
+    }else if(m_command.contains("D"))
+    {
+        emit sendMoveLabel(m_command);
+        for(auto x: qAsConst(ans)){
+            QMatrix4x4 tmp;
+            tmp.rotate(10*m_anti, 0.0f, 1.0f, 0.0f);
+            matrix[x] = tmp * matrix[x];
+        }
+    }else if(m_command.contains("F"))
+    {
+        emit sendMoveLabel(m_command);
+        for(auto x: qAsConst(ans)){
+            QMatrix4x4 tmp;
+            tmp.rotate(-10*m_anti, 0.0f, 0.0f, 1.0f);
+            matrix[x] = tmp * matrix[x];
+        }
+
+    }else if(m_command.contains("B"))
+    {
+        emit sendMoveLabel(m_command);
+        for(auto x: qAsConst(ans)){
+            QMatrix4x4 tmp;
+            tmp.rotate(10*m_anti, 0.0f, 0.0f, 1.0f);
+            matrix[x] = tmp * matrix[x];
+        }
+    }
+    update();
+    if(m_count == 9){//结束
+        m_count = 0;
+        QSet<int> tmp;
+        int *que;
+        if( m_command.contains("R")){
+            tmp=ans & setList[FRONT];
+            que = new int[4]{FRONT, DOWN, BACK, UP};
+        }else if(m_command.contains("L")){
+            tmp=ans & setList[FRONT];
+            que = new int[4]{FRONT, UP, BACK, DOWN};
+        }else if(m_command.contains("U")){
+            tmp=ans & setList[FRONT];
+            que = new int[4]{FRONT, RIGHT, BACK, LEFT};
+        }else if(m_command.contains("D")){
+            tmp=ans & setList[FRONT];
+            que = new int[4]{FRONT, LEFT, BACK, RIGHT};
+        }else if(m_command.contains("F")){
+            tmp=ans & setList[UP];
+            que = new int[4]{UP, LEFT, DOWN, RIGHT};
+        }else if(m_command.contains("B")){
+            tmp=ans & setList[UP];
+            que = new int[4]{UP, RIGHT, DOWN, LEFT};
+        }
+        if(m_anti == -1){
+            qSwap(que[1], que[3]);
+        }
+        for(int i=0; i<4; ++i){
+            setList[que[i]].subtract(ans);
+            if(i<3)
+                setList[que[i]].unite(ans & setList[que[i+1]]);
+            else
+                setList[que[3]].unite(tmp);
+        }
+        delete[] que;
+        m_command.clear();
+        m_anti = 1;
+        killTimer(event->timerId());
+        processNextCommand();
+    }
+    if(commandQueue.empty())
+        emit spinOver();
+}
+
+void BuildCube::processNextCommand()
+{
+    if(commandQueue.isEmpty())
+        return;
+
+    m_command = commandQueue.dequeue();
+    QChar pm = '\'';
+    // 设置角度
+    if(m_command.indexOf(pm) != -1)
+    {
+        m_anti = -1;
+    }else
+    {
+        m_anti = 1;
+    }
+
+    if(m_command.contains("R"))
+    {
+        ans = setList[RIGHT];
+    }else if(m_command.contains("F"))
+    {
+        ans = setList[FRONT];
+    }else if(m_command.contains("B"))
+    {
+        ans = setList[BACK];
+    }else if(m_command.contains("L"))
+    {
+        ans = setList[LEFT];
+    }else if(m_command.contains("U"))
+    {
+        ans = setList[UP];
+    }else if(m_command.contains("D"))
+    {
+        ans = setList[DOWN];
+    }else{
+        m_command.clear();
+        processNextCommand();
+        return;         // 屏蔽无关字符
+    }
+    startTimer(10);
 }

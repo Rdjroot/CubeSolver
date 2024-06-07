@@ -34,8 +34,12 @@ void CameraThread::run()
     cap.open(1);            // 开启的摄像头序列号
     if(!cap.isOpened())
     {
-        qDebug() <<" cap open is failed";
-        return;
+        // 如果获取不到1，尝试获取0
+        cap.open(0);
+        if(!cap.isOpened()){
+            emit cameraFaild();
+            return;
+        }
     }
 
     running = true;

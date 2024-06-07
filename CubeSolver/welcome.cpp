@@ -21,7 +21,7 @@ Welcome::~Welcome()
         mw->close();
         mw->deleteLater();
     }
-    delete solver;
+    solver = nullptr;
     delete ui;
 }
 

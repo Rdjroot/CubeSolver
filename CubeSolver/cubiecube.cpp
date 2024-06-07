@@ -66,6 +66,195 @@ CubieCube::CubieCube(const vector<std::string> &latex)
     }
 }
 
+// 根据六面颜色构造魔方
+CubieCube::CubieCube(unordered_map<string, vector<string>> ruckCube)
+{
+    CcColor cc(ruckCube);
+    for (Corner i = URF; i <= DRB; i = Corner(i + 1))
+    {
+        this->co[i].c = cc.getCorner(cc.co1[i].color[0], cc.co1[i].color[1], cc.co1[i].color[2]);
+        // 获取方向
+        for (int j = 0; j <= 2; j++)
+        {
+            if (cc.co1[i].color[j] == 'Y' || cc.co1[i].color[j] == 'W')
+            {
+                this->co[i].o = j;
+                break;
+            }
+        }
+    }
+    for (Edge i = UR; i <= BR; i = Edge(i + 1))
+    {
+        this->eo[i].e = cc.getEdge(cc.eo1[i].color[0], cc.eo1[i].color[1]);
+        int pos = i / 8;
+        // 获取方向
+        if (pos == 0)
+        {
+            if (cc.eo1[i].color[0] == 'Y' || cc.eo1[i].color[0] == 'W' || cc.eo1[i].color[1] == 'Y' || cc.eo1[i].color[1] == 'W')
+            {
+                this->eo[i].o = (cc.eo1[i].color[0] == 'Y' || cc.eo1[i].color[0] == 'W') ? 0 : 1;
+            }
+            else
+            {
+                if (cc.eo1[i].color[0] == 'R' || cc.eo1[i].color[0] == 'O')
+                {
+                    this->eo[i].o = 1;
+                }
+                else
+                {
+                    this->eo[i].o = 0;
+                }
+            }
+        }
+        else {
+            if (cc.eo1[i].color[0] == 'Y' || cc.eo1[i].color[0] == 'W' || cc.eo1[i].color[1] == 'Y' || cc.eo1[i].color[1] == 'W')
+            {
+                this->eo[i].o = (cc.eo1[i].color[0] == 'Y' || cc.eo1[i].color[0] == 'W') ? 1 : 0;
+            }
+            else {
+                if (cc.eo1[i].color[0] == 'R' || cc.eo1[i].color[0] == 'O')
+                {
+                    this->eo[i].o = 0;
+                }
+                else
+                {
+                    this->eo[i].o = 1;
+                }
+            }
+        }
+
+    }
+}
+
+bool CubieCube::operator==(const CubieCube &other)
+{
+    for(int i = URF; i <= DRB; i++)
+    {
+        if(this->co[i].c != other.co[i].c || this->co[i].o != other.co[i].o )
+            return false;
+    }
+    for(int i = UR; i <= BR; i++)
+    {
+        if(this->eo[i].e != other.eo[i].e || this->eo[i].o != other.eo[i].o )
+            return false;
+    }
+    return true;
+}
+
+// 检查魔方是否合法
+bool CubieCube::checkValid()
+{
+    int crcount = 0;
+    for (int i = 0; i < 8; i++)
+        crcount += this->co[i].o;
+    if (crcount % 3 != 0)
+        return false;
+
+    int egcount = 0;
+    for (int j = 0; j < 12; j++)
+        egcount += this->eo[j].o;
+    if (egcount % 2 != 0)
+        return false;
+
+    return true;
+}
+
+CcColor::CcColor(unordered_map<string, vector<string>>& ruckCube)
+{
+    vector<string> yellowface = ruckCube["yellow"];
+    this->co1[ULB].color[0] = colorUpper[yellowface[0]];
+    this->eo1[UB].color[0] = colorUpper[yellowface[1]];
+    this->co1[UBR].color[0] = colorUpper[yellowface[2]];
+    this->eo1[UL].color[0] = colorUpper[yellowface[3]];
+    this->eo1[UR].color[0] = colorUpper[yellowface[5]];
+    this->co1[UFL].color[0] = colorUpper[yellowface[6]];
+    this->eo1[UF].color[0] = colorUpper[yellowface[7]];
+    this->co1[URF].color[0] = colorUpper[yellowface[8]];
+
+    // 下
+    vector<string> whiteface = ruckCube["white"];
+    this->co1[DLF].color[0] = colorUpper[whiteface[0]];
+    this->eo1[DF].color[0] = colorUpper[whiteface[1]];
+    this->co1[DFR].color[0] = colorUpper[whiteface[2]];
+    this->eo1[DL].color[0] = colorUpper[whiteface[3]];
+    this->eo1[DR].color[0] = colorUpper[whiteface[5]];
+    this->co1[DBL].color[0] = colorUpper[whiteface[6]];
+    this->eo1[DB].color[0] = colorUpper[whiteface[7]];
+    this->co1[DRB].color[0] = colorUpper[whiteface[8]];
+
+    // 前
+    vector<string> blueface = ruckCube["blue"];
+    this->co1[UFL].color[1] = colorUpper[blueface[0]];
+    this->eo1[UF].color[1] = colorUpper[blueface[1]];
+    this->co1[URF].color[2] = colorUpper[blueface[2]];
+    this->eo1[FL].color[1] = colorUpper[blueface[3]];
+    this->eo1[FR].color[1] = colorUpper[blueface[5]];
+    this->co1[DLF].color[2] = colorUpper[blueface[6]];
+    this->eo1[DF].color[1] = colorUpper[blueface[7]];
+    this->co1[DFR].color[1] = colorUpper[blueface[8]];
+
+    // 后
+    vector<string> greenface = ruckCube["green"];
+    this->co1[UBR].color[1] = colorUpper[greenface[0]];
+    this->eo1[UB].color[1] = colorUpper[greenface[1]];
+    this->co1[ULB].color[2] = colorUpper[greenface[2]];
+    this->eo1[BR].color[1] = colorUpper[greenface[3]];
+    this->eo1[BL].color[1] = colorUpper[greenface[5]];
+    this->co1[DRB].color[2] = colorUpper[greenface[6]];
+    this->eo1[DB].color[1] = colorUpper[greenface[7]];
+    this->co1[DBL].color[1] = colorUpper[greenface[8]];
+
+    // 右
+    vector<string> redface = ruckCube["red"];
+    this->co1[URF].color[1] = colorUpper[redface[0]];
+    this->eo1[UR].color[1] = colorUpper[redface[1]];
+    this->co1[UBR].color[2] = colorUpper[redface[2]];
+    this->eo1[FR].color[0] = colorUpper[redface[3]];
+    this->eo1[BR].color[0] = colorUpper[redface[5]];
+    this->co1[DFR].color[2] = colorUpper[redface[6]];
+    this->eo1[DR].color[1] = colorUpper[redface[7]];
+    this->co1[DRB].color[1] = colorUpper[redface[8]];
+
+    // 左
+    vector<string> orangeface = ruckCube["orange"];
+    this->co1[ULB].color[1] = colorUpper[orangeface[0]];
+    this->eo1[UL].color[1] = colorUpper[orangeface[1]];
+    this->co1[UFL].color[2] = colorUpper[orangeface[2]];
+    this->eo1[BL].color[0] = colorUpper[orangeface[3]];
+    this->eo1[FL].color[0] = colorUpper[orangeface[5]];
+    this->co1[DBL].color[2] = colorUpper[orangeface[6]];
+    this->eo1[DL].color[1] = colorUpper[orangeface[7]];
+    this->co1[DLF].color[1] = colorUpper[orangeface[8]];
+}
+
+// 获取角块位置
+Corner CcColor::getCorner(char a, char b, char c)
+{
+
+    Corner tt;
+    string temp = "";
+    temp.push_back(a);
+    temp.push_back(b);
+    temp.push_back(c);
+    std::sort(temp.begin(), temp.end());
+    tt = clToCrn[temp];
+    return tt;
+
+}
+
+Edge CcColor::getEdge(char a, char b)
+{
+
+    Edge tt;
+    string temp = "";
+    temp.push_back(a);
+    temp.push_back(b);
+    std::sort(temp.begin(), temp.end());
+    tt = clToEdg[temp];
+    return tt;
+
+}
+
 //  旋转公式
 vector<CubieCube> initMove()
 {

@@ -4,6 +4,7 @@
 #include<vector>
 #include<unordered_map>
 #include<string>
+#include<algorithm>
 using std::unordered_map;
 using std::vector;
 using std::string;
@@ -44,6 +45,44 @@ static unordered_map<int, string> stepMap = { {0,"U"},{1,"U2"},{2,"U'"},
 	{15,"B"},{16,"B2"},{17,"B'"},
 };
 
+static unordered_map<string, char> colorUpper = { {"yellow",'Y'},
+	{"white",'W'},
+	{"blue",'B'},
+	{"red",'R'},
+	{"green",'G'},
+	{"orange",'O'}
+};
+
+static unordered_map<string, Corner> clToCrn = { { "BRY", URF},  { "BOY", UFL},  { "GOY", ULB},  { "GRY", UBR},  { "BRW", DFR},  { "BOW", DLF},  { "GOW", DBL},  { "GRW", DRB} };
+
+static unordered_map<string, Edge> clToEdg = { { "RY", UR},  { "BY", UF},  { "OY", UL},  { "GY", UB},  { "RW", DR},  { "BW", DF},  { "OW", DL},  { "GW", DB},  { "BR", FR},  { "BO", FL},  { "GO", BL},  { "GR", BR} };
+
+class CcColor {
+	struct cn_c 
+	{
+		Corner c;
+		int o;
+		char color[3];
+	};
+	struct eg_c
+	{
+		Edge e;
+		int o;
+		char color[2];
+	};
+public:
+	cn_c co1[8];
+	eg_c eo1[12];
+
+	CcColor(unordered_map<string, vector<string>>& ruckCube);
+
+	// 获取角块位置
+	Corner getCorner(char a, char b, char c);
+
+	// 获取棱块位置
+	Edge getEdge(char a, char b);
+};
+
 class CubieCube
 {
 public:
@@ -59,7 +98,14 @@ public:
 	// 自定义初始化构造函数，为了MOVE模型
 	CubieCube(const std::initializer_list<corner_o> crn, const std::initializer_list<edge_o> edg);
 
+	// 根据打乱公式构造魔方
 	CubieCube(const vector<string>& latex);
+
+	// 根据六面颜色构造魔方
+	CubieCube(unordered_map<string, vector<string>> ruckCube);
+
+	// 检查当前魔方是否合法
+	bool checkValid();
 
 	void print() const;		// 打印函数，方便调试
 

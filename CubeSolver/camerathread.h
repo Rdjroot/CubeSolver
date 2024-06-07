@@ -28,6 +28,7 @@ signals:
     // 控制显示的画面
     void frameReady(const cv::Mat &frame);
     void framePause(const cv::Mat &frame);
+    void cameraFaild();
 
 protected:
     // 函数重载，线程运行

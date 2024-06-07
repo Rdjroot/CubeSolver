@@ -24,6 +24,7 @@ cubeDetect::cubeDetect(QWidget *parent) :
     // 获取摄像机画面并展示
     connect(camera_t, &CameraThread::frameReady, this, &cubeDetect::dealImgInfo);
     connect(camera_t, &CameraThread::framePause, this, &cubeDetect::pauseImg);
+    connect(camera_t, &CameraThread::cameraFaild, this,&cubeDetect::getCameraFailed);
 
     // 画面暂停还是继续分析
     connect(this, &cubeDetect::changeFlag, camera_t, &CameraThread::runOrPause);
@@ -166,6 +167,11 @@ void cubeDetect::pauseImg(cv::Mat img)
 {
      cv::circle(myImg, cv::Point(400, 50), 20, cv::Scalar(0, 0, 255),cv::FILLED);
      MatToQImage();
+}
+
+void cubeDetect::getCameraFailed()
+{
+    QMessageBox::information(this, "警告", "无法获取系统摄像头，请检查！");
 }
 
 // 获取当前色块颜色
