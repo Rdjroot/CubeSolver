@@ -5,13 +5,13 @@
 
 ## 项目说明
 
-本项目为基于QT5和OpenCV的图像识别魔方还原程序。
+本项目为基于QT5和OpenCV3.41的图像识别魔方还原程序。
 
 还原算法采用科先巴二阶段算法。
 
 实现了输入打乱公式提供还原公式的功能，以及通过摄像头扫描识别魔方六面，获取魔方还原公式，且提供3D魔方图像动画演示。
 
-以下是用法展示
+以下展示y用法
 
 ### 快速使用
 
@@ -25,12 +25,57 @@
 
 ## 项目目录
 
-1. 主要Demo
+1. 主要Demo(文件夹)
 
-```make
+```makefile
+|---Code
+├── algorithm/                    
+│   ├── Cube_Algorithm/				# 魔方还原算法
+│   │   ├── CubieCube.h/cpp			# 魔方数据结构
+│   │   └── Solver.h/cpp			# 还原算法
+|	|  	└── testMain.cpp			# 测试
+|	|
+├── demo/                           # opencv 魔方图像识别demo
+│   ├── ColorPickerDemo.cpp			# 筛选六色HSV值
+│   ├── getCubeInfos.cpp			# 颜色识别轮廓勾勒demo
+│   └──  CubeFrameReco.cpp			# 划定区域识别每面颜色
+└── 
 ```
 
+2. QT程序（项目）
 
+```makefile
+CubeSolver/
+├── Headers/
+│   ├── buildcube.h				# opengl 魔方3D图像窗口
+|	├── camerathread.h 			# 开启摄像头，传递画面线程类
+|	├── cubedetec.h 			# 监控摄像画面，识别魔方颜色窗口
+│   ├── cubiecube.h				# 魔方数据结构类
+│   ├── mainwindow.h			# 多功能窗口
+│   ├── solver.h				# 魔方还原算法
+│   └── welcome.h				# 程序首窗口
+├── Sources/
+│   ├── buildcube.cpp				
+|	├── camerathread.cpp 			
+|	├── cubedetec.cpp			
+│   ├── cubiecube.cpp				
+│   ├── mian.cpp				# 程序入口
+│   ├── mainwindow.cpp			
+│   ├── solver.cpp				
+│   └── welcome.cpp				
+├── Forms/
+│   ├── buildcube.ui
+│   ├── cubedetec.ui
+│   ├── mainwindow.ui
+│   └── welcome.ui
+├── Resources/
+│   ├── /
+│   ├── shapes.frag				# opengl渲染文件
+│   ├── shapes.vert
+│   └── Resource/
+│   	└── cubeIcon.png		# 图标
+└── CubeSolver.pro
+```
 
 ## 开发指南
 
