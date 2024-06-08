@@ -11,6 +11,7 @@
 #include<chrono>
 #include<iostream>
 #include<cmath>;
+#include<memory>
 using std::cin;
 using std::endl;
 using std::cout;
@@ -21,15 +22,17 @@ using std::string;
 using std::vector;
 using std::unordered_map;
 
+
 class Solver
 {
 public:
     // 单例模式
-    static Solver* getInstance() {
-        if (instance == nullptr)
-            instance = new Solver();
-        return instance;
-    }
+    static std::shared_ptr<Solver> getInstance() {
+            if (!instance) {
+                instance = std::shared_ptr<Solver>(new Solver());
+            }
+            return instance;
+     }
 
     ~Solver();
 
@@ -37,7 +40,7 @@ public:
 
 private:
     // 成员数据
-    static Solver* instance;
+    static std::shared_ptr<Solver> instance;
 
     CubieCube orgccb;
 

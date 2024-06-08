@@ -8,6 +8,7 @@
 #include "sstream"
 #include<vector>
 #include "mainwindow.h"
+#include<memory>
 
 namespace Ui {
 class Welcome;
@@ -26,7 +27,7 @@ public:
 
 private:
     Ui::Welcome *ui;
-    Solver* solver;
+    std::shared_ptr<Solver> solver;
     MainWindow *mw;
 
 signals:

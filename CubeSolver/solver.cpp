@@ -1,6 +1,6 @@
 #include "Solver.h"
 
-Solver* Solver::instance = nullptr;
+std::shared_ptr<Solver> Solver::instance = nullptr;
 
 Solver::Solver()
 {
@@ -37,8 +37,6 @@ Solver::Solver()
 
 Solver::~Solver()
 {
-    if (instance != nullptr)
-        delete instance;
 }
 
 void Solver::initCN_K()

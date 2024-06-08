@@ -61,6 +61,8 @@ private slots:
     // 暂停画面展示
     void pauseImg(cv::Mat img);
 
+    void getCameraFailed();
+
 private:
     Ui::cubeDetect *ui;
 

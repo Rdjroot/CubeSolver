@@ -71,8 +71,6 @@ void Welcome::getResult(CubieCube originCube)
     ui->latexOutput->setText(res);
 }
 
-
-
 void Welcome::on_scanUsing_clicked()
 {
     if(mw == nullptr)

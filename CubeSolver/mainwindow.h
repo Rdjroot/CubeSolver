@@ -50,7 +50,7 @@ private:
     shared_ptr<BuildCube> bdc;
 
     // 求解
-    Solver* solver;
+    shared_ptr<Solver> solver;
 
     // opengl 魔方展示對象
     // 存储魔方色块

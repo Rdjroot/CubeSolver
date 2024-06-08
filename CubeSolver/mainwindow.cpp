@@ -541,6 +541,7 @@ void MainWindow::on_pushButton_4_clicked()
 
 void MainWindow::on_solveButton_clicked()
 {
+    ui->ansLabel->clear();
     QString inputInfo = ui->inputLabel->text();
     bool gotAns = false;
     // 如果非还原状态：直接求解
