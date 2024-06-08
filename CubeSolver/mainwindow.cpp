@@ -25,6 +25,10 @@ MainWindow::MainWindow(QWidget *parent)
     solver = Solver::getInstance();
     ui->openGLWidget->hide();
 
+    QPalette palette;
+    palette.setBrush(QPalette::Background,QBrush(QPixmap(":/Resource/grey.jpeg")));
+    this->setPalette(palette);
+
     this->bdc = nullptr;
 
     // 調試代碼隱藏

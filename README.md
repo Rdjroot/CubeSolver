@@ -11,17 +11,23 @@
 
 实现了输入打乱公式提供还原公式的功能，以及通过摄像头扫描识别魔方六面，获取魔方还原公式，且提供3D魔方图像动画演示。
 
-以下展示y用法
+以下展示用法
 
 ### 快速使用
 
 - 输入打乱公式，获取还原公式
 
+![quickUse](https://raw.githubusercontent.com/Rdjroot/Img_beds/master/img/202406082308034.gif)
+
 ### 扫描使用
 
 #### 魔方识别并给出还原公式和动画
 
+![camerause](https://raw.githubusercontent.com/Rdjroot/Img_beds/master/img/202406082309082.gif)
+
 #### 输入打乱公式获取还原公式和动画
+
+![latex](https://raw.githubusercontent.com/Rdjroot/Img_beds/master/img/202406082310234.gif)
 
 ## 项目目录
 

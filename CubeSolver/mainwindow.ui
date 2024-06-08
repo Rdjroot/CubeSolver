@@ -818,7 +818,7 @@
    <widget class="QPushButton" name="startSolveButton">
     <property name="geometry">
      <rect>
-      <x>710</x>
+      <x>720</x>
       <y>150</y>
       <width>71</width>
       <height>20</height>
@@ -957,8 +957,8 @@ font: 36pt &quot;黑体&quot;;</string>
    <widget class="QLabel" name="infoLabel">
     <property name="geometry">
      <rect>
-      <x>710</x>
-      <y>210</y>
+      <x>720</x>
+      <y>220</y>
       <width>61</width>
       <height>151</height>
      </rect>

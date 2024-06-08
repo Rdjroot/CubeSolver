@@ -3,5 +3,7 @@
         <file>Resource/cubeIcon.png</file>
         <file>shapes.frag</file>
         <file>shapes.vert</file>
+        <file>Resource/spinCube.jpg</file>
+        <file>Resource/grey.jpeg</file>
     </qresource>
 </RCC>

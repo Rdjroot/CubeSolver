@@ -9,6 +9,9 @@ Welcome::Welcome(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowIcon(QIcon(":/Resource/cubeIcon.png"));
+    QPalette palette;
+    palette.setBrush(QPalette::Background,QBrush(QPixmap(":/Resource/spinCube.jpg")));
+    this->setPalette(palette);
     connect(this,&Welcome::initTables,this,&Welcome::initSolver);
     connect(this,&Welcome::calAnswer,this,&Welcome::getResult);
     emit initTables();
