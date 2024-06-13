@@ -16,14 +16,13 @@ cubeDetect::cubeDetect(QWidget *parent) :
 
     this->setWindowTitle("Rubik's Cube recognition");
 
-//    qDebug() << "cubeDetect constructor";
-
     // 注册 Mat 类型
     qRegisterMetaType<cv::Mat>("cv::Mat");
 
     // 获取摄像机画面并展示
     connect(camera_t, &CameraThread::frameReady, this, &cubeDetect::dealImgInfo);
     connect(camera_t, &CameraThread::framePause, this, &cubeDetect::pauseImg);
+    // 获取摄像头失败
     connect(camera_t, &CameraThread::cameraFaild, this,&cubeDetect::getCameraFailed);
 
     // 画面暂停还是继续分析
@@ -56,80 +55,34 @@ cubeDetect::cubeDetect(QWidget *parent) :
 
     this->colorMap = { {0, "white"},{1,"yellow"},{2,"blue"} ,
                        {3,"red"},{4,"green"},{5,"orange"} };
-//    qDebug() << "cubeDetect initialized";
 }
 
 cubeDetect::~cubeDetect()
 {
-    qDebug() <<"start dst cubeDetect";
-//    emit allInfoGet(this->sixFaces);
+//    cout<< "delete this "<<endl;
     if(camera_t && camera_t->isRunning())
     {
         camera_t->stop();
     }
-    qDebug() <<"camera_t is stop!";
-//    destroyAllWindows(); // 销毁所有窗口
-    delete camera_t;
+    delete camera_t;        // 去掉线程
     delete mtx;
-    qDebug() << "cubeDetect destructor";
     delete ui;
 }
 
-void cubeDetect::dealImgInfo(cv::Mat img)
+void cubeDetect::closeEvent(QCloseEvent *event)
 {
-    if(img.empty())
-    {
-        qDebug() <<"receive img is empty!";
-        return;
-    }
-
-    this->myImg = img;
-
-    // 描绘识别框
-    cv::rectangle(this->myImg, Frame[0], Frame[1], cv::Scalar(255, 255,255), 2);
-    cv::Mat divCube,divHSV;
-    vector<string> temp;
-
-    // 魔方一面的九个色块识别
-    for (int i = 0; i < 9; i++)
-    {
-        // 裁剪色块
-        cv::Rect roi(ninePoints[i][0],ninePoints[i][1]);
-        divCube = this->myImg(roi);
-        cv::cvtColor(divCube, divHSV, cv::COLOR_BGR2HSV);
-        // 定义的六种颜色将会被识别
-        for (int j = 0; j < colorsHSV.size(); j++) {
-            cv::Scalar lower(colorsHSV[j][0], colorsHSV[j][2], colorsHSV[j][4]);
-            cv::Scalar upper(colorsHSV[j][1], colorsHSV[j][3], colorsHSV[j][5]);
-            cv::Mat mask;
-            // 匹配颜色，将会是白色块，其余是黑色
-            inRange(divHSV, lower, upper, mask);
-
-            // 在原图中勾勒获取识别出的颜色
-            string color = getContours(mask, j, i);
-
-            // 識別出了顔色
-            if (!color.empty()) {
-                temp.push_back(color);
-                break;
-            }
-        }
-    }
-
-//    qDebug() <<"deal over!";
-    // 如果识别出的是9个色块,存放在cache里
-    if(temp.size() == 9)
-        this->cache = temp;
-    MatToQImage();
+    emit cbdExitWin();
 }
+
+
 
 void cubeDetect::on_saveButton_clicked()
 {
     // 判断是否获取到了数据
     if(this->cache.size() == 9)
     {
-        string center = this->cache[4];
-        this->sixFaces.insert({ center, cache });
+//        string center = this->cache[4];
+//        this->sixFaces.insert({ center, cache });
         emit sendData(this->cache);
     }else{
         qDebug() << "[Warning]send info faild, the info size is :" << this->cache.size();
@@ -174,6 +127,56 @@ void cubeDetect::getCameraFailed()
     QMessageBox::information(this, "警告", "无法获取系统摄像头，请检查！");
 }
 
+void cubeDetect::dealImgInfo(cv::Mat img)
+{
+    if(img.empty())
+    {
+        qDebug() <<"receive img is empty!";
+        return;
+    }
+
+    this->myImg = img;
+
+    // 描绘识别框
+    cv::rectangle(this->myImg, Frame[0], Frame[1], cv::Scalar(255, 255,255), 2);
+    cv::Mat divCube,divHSV;
+    vector<string> temp;
+
+    // 魔方一面的九个色块识别
+    for (int i = 0; i < 9; i++)
+    {
+        // 裁剪色块
+        cv::Rect roi(ninePoints[i][0],ninePoints[i][1]);
+        divCube = this->myImg(roi);
+        cv::cvtColor(divCube, divHSV, cv::COLOR_BGR2HSV);
+
+        // 定义的六种颜色将会被识别
+        for (int j = 0; j < colorsHSV.size(); j++) {
+            // 设置阈值
+            cv::Scalar lower(colorsHSV[j][0], colorsHSV[j][2], colorsHSV[j][4]);
+            cv::Scalar upper(colorsHSV[j][1], colorsHSV[j][3], colorsHSV[j][5]);
+            cv::Mat mask;
+
+            // 匹配颜色，将会是白色块，其余是黑色
+            inRange(divHSV, lower, upper, mask);
+
+            // 在原图中勾勒获取识别出的颜色
+            string color = getContours(mask, j, i);
+
+            // 成功识别
+            if (!color.empty()) {
+                temp.push_back(color);
+                break;
+            }
+        }
+    }
+
+    // 如果识别出的是9个色块,存放在cache里
+    if(temp.size() == 9)
+        this->cache = temp;
+    MatToQImage();
+}
+
 // 获取当前色块颜色
 string cubeDetect::getContours(cv::Mat imgDil, const int colorInt, const int pos)
 {
@@ -215,6 +218,7 @@ void cubeDetect::MatToQImage()
     } catch (...) {
         qDebug() << "Unknown exception caught";
     }
+
     ui->label->setPixmap(QPixmap::fromImage(img));
 }
 

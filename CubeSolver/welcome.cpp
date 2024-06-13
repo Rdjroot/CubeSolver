@@ -80,9 +80,9 @@ void Welcome::on_scanUsing_clicked()
     {
         mw = new MainWindow();
     }
+    connect(mw,MainWindow::ExitWin,this,Welcome::mwClose);
     mw->show();
     this->hide();
-    connect(mw,MainWindow::ExitWin,this,Welcome::mwClose);
 }
 
 void Welcome::mwClose()

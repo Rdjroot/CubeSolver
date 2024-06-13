@@ -41,6 +41,9 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    bool spinover;
+
+    //當前魔方
     CubieCube ccb;
 
     // 魔方信息识别对象
@@ -52,9 +55,10 @@ private:
     // 求解
     shared_ptr<Solver> solver;
 
-    // opengl 魔方展示對象
     // 存储魔方色块
     unordered_map<string, vector<string>> ruckCube;
+
+    // opengl 魔方展示對象
     unordered_map<string, vector<string>> cubeForGL;
 
     vector<string> COLORS;
@@ -70,6 +74,7 @@ private:
     // 存储当前解法
     vector<string> answerLatex;
 
+    // 互斥量，防止動畫覆蓋
     QMutex qmtx;
 
 private slots:
@@ -82,46 +87,57 @@ private slots:
     // 处理一次传过来的数据
     void get_once_info(vector<string>);
 
+    // 用掃描的顔色構建模仿
     void on_constructButton_clicked();
 
+    // 調試代碼
     void on_pushButton_4_clicked();
-
-    void on_solveButton_clicked();
-
-    void on_closeShowButton_clicked();
-
     void on_pushButton_U2_clicked();
-
     void on_pushButton_L1_clicked();
-
     void on_pushButton_F_clicked();
 
+    // 求解
+    void on_solveButton_clicked();
+
+    // 關閉3D展示
+    void on_closeShowButton_clicked();
+
+    // 還原動畫演示
     void on_startSolveButton_clicked();
 
+    // 匹配動畫動作
     void showMoveLabel(QString m);
 
+    // 需要轉動的隊列
     void spinCubeAction(vector<string> moves);
 
+    // 復原3D魔方
     void on_restoreButton_clicked();
 
+    // 後臺旋轉結束
     void spinOverDeal();
 
 private:
+    // 魔方是否復原
     bool reduction;
-
-    bool spinstatus;
-
+    
+    // 根據掃描顔色，改變主界面矩陣
     void changeBottonColor(const QString & buttonName, const QString & color);
 
+    // 初始化还原状态魔方的颜色矩阵
     void initVertices();
 
+    // 存储的颜色map和opengl图像矩阵的顺序映射关系
     void initTransformForOpenGL();
 
+    // 将现有的颜色map根据映射贴图到颜色矩阵中
     void drawingCubeColor();
 
+    // 显示opengl窗口
     void opengl_showCube();
 
 protected:
+    // 窗口关闭，释放对象
     void closeEvent(QCloseEvent *event) override;
 
 signals:
@@ -134,6 +150,10 @@ signals:
     void sendStrToCube(QString m);
 
     void spinCube(vector<string> moves);
+
+    void clearQueue();
+
+    void executeCommand();
 };
 
 #endif // MAINWINDOW_H

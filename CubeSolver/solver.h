@@ -36,6 +36,7 @@ public:
 
     ~Solver();
 
+    // 获取还原公式
     vector<string> getSolveLatex(CubieCube originCube);
 
 private:

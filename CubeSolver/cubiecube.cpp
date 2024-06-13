@@ -126,33 +126,22 @@ CubieCube::CubieCube(unordered_map<string, vector<string>> ruckCube)
     }
 }
 
-bool CubieCube::operator==(const CubieCube &other)
-{
-    for(int i = URF; i <= DRB; i++)
-    {
-        if(this->co[i].c != other.co[i].c || this->co[i].o != other.co[i].o )
-            return false;
-    }
-    for(int i = UR; i <= BR; i++)
-    {
-        if(this->eo[i].e != other.eo[i].e || this->eo[i].o != other.eo[i].o )
-            return false;
-    }
-    return true;
-}
-
 // 检查魔方是否合法
 bool CubieCube::checkValid()
 {
     int crcount = 0;
     for (int i = 0; i < 8; i++)
         crcount += this->co[i].o;
+
+    // 角块的方向受到三约束
     if (crcount % 3 != 0)
         return false;
 
     int egcount = 0;
     for (int j = 0; j < 12; j++)
         egcount += this->eo[j].o;
+
+    // 棱块的方向受到2约束
     if (egcount % 2 != 0)
         return false;
 
@@ -237,14 +226,15 @@ Corner CcColor::getCorner(char a, char b, char c)
     temp.push_back(b);
     temp.push_back(c);
     std::sort(temp.begin(), temp.end());
+    // 查找颜色映射
     tt = clToCrn[temp];
     return tt;
 
 }
 
+// 獲取棱塊位置
 Edge CcColor::getEdge(char a, char b)
 {
-
     Edge tt;
     string temp = "";
     temp.push_back(a);

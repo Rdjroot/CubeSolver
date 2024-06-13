@@ -466,10 +466,11 @@ void Solver::initTables()
     auto seven = std::chrono::high_resolution_clock::now();
 
     vector<std::chrono::duration<double>> duration = { two - one, three - two, four - three, five - four, six - five,  seven - six };
-    cout << "all running time:  ";
-    for (auto dt : duration)
-        cout << dt.count() << ", ";
-    cout << endl;
+    // 调试代码
+//    cout << "all running time:  ";
+//    for (auto dt : duration)
+//        cout << dt.count() << ", ";
+//    cout << endl;
 }
 
 void Solver::searchPartTwo(int cp, int eundp, int emp, int curDepth, vector<int>& result, vector<int>& steps, int& finishFlag)
@@ -519,7 +520,7 @@ void Solver::searchPartTwo(int cp, int eundp, int emp, int curDepth, vector<int>
                 continue;
 
             steps.push_back(mv);
-            searchPartTwo(cpNew, eundpNew, empNew, curDepth - 1,result,steps,finishFlag);
+            searchPartTwo(cpNew, eundpNew, empNew, curDepth - 1,result, steps, finishFlag);
             steps.pop_back();
         }
     }

@@ -44,7 +44,6 @@ static unordered_map<int, string> stepMap = { {0,"U"},{1,"U2"},{2,"U'"},
     {15,"B"},{16,"B2"},{17,"B'"},
 };
 
-
 static unordered_map<string, char> colorUpper = { {"yellow",'Y'},
     {"white",'W'},
     {"blue",'B'},
@@ -57,6 +56,7 @@ static unordered_map<string, Corner> clToCrn = { { "BRY", URF},  { "BOY", UFL}, 
 
 static unordered_map<string, Edge> clToEdg = { { "RY", UR},  { "BY", UF},  { "OY", UL},  { "GY", UB},  { "RW", DR},  { "BW", DF},  { "OW", DL},  { "GW", DB},  { "BR", FR},  { "BO", FL},  { "GO", BL},  { "GR", BR} };
 
+// 仅为颜色转cube服务的类
 class CcColor {
     struct cn_c
     {
@@ -103,8 +103,6 @@ public:
 
     // 根据六面颜色构造魔方
     CubieCube(unordered_map<string, vector<string>> ruckCube);
-
-    bool operator==(const CubieCube &other);
 
     // 检查当前魔方是否合法
     bool checkValid();

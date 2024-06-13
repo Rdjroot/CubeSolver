@@ -8,9 +8,10 @@ MainWindow::MainWindow(QWidget *parent)
     , rcb(nullptr)
     , solver(nullptr)
 {
+    ui->setupUi(this);
     this->setWindowIcon(QIcon(":/Resource/cubeIcon.png"));
     this->setWindowTitle("CubeSolver");
-    ui->setupUi(this);
+
     ui->blue5->setStyleSheet("background-color: blue");
     ui->white5->setStyleSheet("background-color: white");
     ui->orange5->setStyleSheet("background-color: orange");
@@ -21,15 +22,16 @@ MainWindow::MainWindow(QWidget *parent)
     this->COLORS = {"blue","green","yellow","white","orange","red"};
 
     this->ccb = CubieCube(0);       // 获取一个还原状态的魔方
-    this->reduction = true;            // 是否为还原状态
-    solver = Solver::getInstance();
-    ui->openGLWidget->hide();
 
+    this->reduction = true;            // 是否为还原状态
+
+    solver = Solver::getInstance();
+    this->spinover = true;
+
+    // 设置背景图
     QPalette palette;
     palette.setBrush(QPalette::Background,QBrush(QPixmap(":/Resource/grey.jpeg")));
     this->setPalette(palette);
-
-    this->bdc = nullptr;
 
     // 調試代碼隱藏
     ui->pushButton_4->hide();
@@ -38,21 +40,28 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pushButton_U2->hide();
 
     initTransformForOpenGL();
+
+    // 关联图像界面
     connect(this, &MainWindow::showCube, this, &MainWindow::on_constructButton_clicked);
     connect(this, &MainWindow::hideCube, this, &MainWindow::on_closeShowButton_clicked);
+
     // 关联旋转信号
     connect(this, &MainWindow::spinCube,this ,&MainWindow::spinCubeAction);
+
     // 展示魔方
     emit showCube();
 }
 
 MainWindow::~MainWindow()
 {
+    // 删除识别窗口对象
     if(rcb !=nullptr)
     {
         rcb->close();
         rcb->deleteLater();
     }
+
+    // 智能指针计数器归零
     bdc = nullptr;
     solver = nullptr;
     emit ExitWin();
@@ -62,14 +71,17 @@ MainWindow::~MainWindow()
 // 打开摄像头
 void MainWindow::on_openCameraButton_clicked()
 {
+    if(!spinover)
+        return;
     emit hideCube();
     if (rcb == nullptr) {
         rcb = new cubeDetect();
-        qDebug() << "cubeDetect object created";
+//        qDebug() << "cubeDetect object created";
         connect(rcb, &cubeDetect::sendData, this, &MainWindow::get_once_info);
+        connect(rcb,&cubeDetect::cbdExitWin, this,&MainWindow::on_closeCameraButton_clicked);
     }
     rcb->show();
-    qDebug() << "cubeDetect window shown";
+//    qDebug() << "cubeDetect window shown";
 }
 
 // 关闭摄像头
@@ -77,6 +89,7 @@ void MainWindow::on_closeCameraButton_clicked()
 {
     if(rcb != nullptr)
     {
+        // 正确管理内置指针对象
         rcb->close();
         rcb->deleteLater();
         rcb = nullptr;
@@ -98,6 +111,8 @@ void MainWindow::get_once_info(vector<string> infos)
         QString buttonName = faceCenter + QString::number(i);
         QString color = QString::fromStdString(infos[i-1]);
 //        qDebug() <<"color not found: " << color;
+
+        // 更改界面颜色矩阵，保持和存储内容一致
         changeBottonColor(buttonName, color);
     }
 }
@@ -468,8 +483,12 @@ void MainWindow::drawingCubeColor()
 // 展示3D魔方
 void MainWindow::on_constructButton_clicked()
 {
+    if(!spinover)
+        return;
+    // 判断是否有识别的颜色
     if(this->ruckCube.size() == 6)
     {
+        // 构造魔方
         CubieCube cforccb(this->ruckCube);
         if(!cforccb.checkValid())
         {
@@ -478,6 +497,7 @@ void MainWindow::on_constructButton_clicked()
         }else{
             this->ccb = cforccb;
             drawingCubeColor();
+
             // 将魔方置为非还原状态
             this->reduction = false;
         }
@@ -489,13 +509,21 @@ void MainWindow::on_constructButton_clicked()
 
 void MainWindow::opengl_showCube()
 {
-    // 将原先的动态内存释放
+    // bdc根据当前颜色数组构造魔方
     bdc = make_shared<BuildCube>(nullptr, this->vertices);
 
+    // 旋转字符 -> 旋转动作
     connect(this, &MainWindow::sendStrToCube, bdc.get(), &BuildCube::rotateCube);
+
+    // 当前旋转动作-> 旋转字符
     connect(bdc.get(), &BuildCube::sendMoveLabel, this, &MainWindow::showMoveLabel);
+
+    // 旋转完成 -> 确认
     connect(bdc.get(), &BuildCube::spinOver, this,&MainWindow::spinOverDeal);
 
+    connect(this, &MainWindow::executeCommand, bdc.get(), &BuildCube::execCommand);
+
+    // 将opengl图像放到布局中
     QVBoxLayout *layout = new QVBoxLayout();
     layout->addWidget(bdc.get());
 
@@ -513,10 +541,11 @@ void MainWindow::opengl_showCube()
         }
         delete ui->openGLWidget->layout();
     }
+
     ui->openGLWidget->setLayout(layout);
 
     ui->openGLWidget->show();
-    bdc->setFocus();
+//    bdc->setFocus();
 }
 
 
@@ -545,6 +574,9 @@ void MainWindow::on_pushButton_4_clicked()
 
 void MainWindow::on_solveButton_clicked()
 {
+    if(!spinover)
+        return;
+
     ui->ansLabel->clear();
     QString inputInfo = ui->inputLabel->text();
     bool gotAns = false;
@@ -578,7 +610,7 @@ void MainWindow::on_solveButton_clicked()
             latex.push_back(str);
         }
 
-        if(check)
+        if(check && !latex.empty())
         {
             this->ccb = CubieCube(latex);
             // 获取求解公式
@@ -587,7 +619,7 @@ void MainWindow::on_solveButton_clicked()
             qmtx.lock();
             // 通过latex进行旋转
             emit spinCube(latex);
-            this->reduction = false;
+            this->reduction = false;        // 魔方非还原状态
             ui->infoLabel->setText("正在\n打乱\n魔方\n请稍后\n");
             qmtx.unlock();
         }
@@ -613,6 +645,7 @@ void MainWindow::on_closeShowButton_clicked()
     ui->openGLWidget->hide();
 }
 
+// 调试代码
 void MainWindow::on_pushButton_U2_clicked()
 {
     emit sendStrToCube("U2");
@@ -631,6 +664,12 @@ void MainWindow::on_pushButton_F_clicked()
 // 进行动画旋转旋转
 void MainWindow::on_startSolveButton_clicked()
 {
+    if(!spinover)
+    {
+        QMessageBox::information(this, "提示","请等待动画结束。");
+        return;
+    }
+
     if(this->reduction == false){
         qmtx.lock();
         vector<string> &ans = this->answerLatex;
@@ -639,7 +678,7 @@ void MainWindow::on_startSolveButton_clicked()
         this->reduction = true;             // 代表魔方已还原
     }else
     {
-        QMessageBox::information(this,"提示","魔方已回到还原状态。");
+        QMessageBox::information(this, "提示", "魔方已回到还原状态。");
     }
 
 }
@@ -651,34 +690,40 @@ void MainWindow::showMoveLabel(QString m)
 
 void MainWindow::spinCubeAction(vector<string> moves)
 {
+    this->spinover = false;
     for(auto s: moves)
     {
-        cout << s;
         QString qstr = QString::fromStdString(s);
         emit sendStrToCube(qstr);
-        QThread::msleep(10); // 添加50毫秒的延迟
+        QThread::msleep(10); // 添加10毫秒的延迟
         // 如果包含2就转两次
         if(qstr.contains("2"))
         {
-            cout << s;
             emit sendStrToCube(qstr);
-            QThread::msleep(10); // 添加50毫秒的延迟
+            QThread::msleep(10); // 添加10毫秒的延迟
         }
     }
+    emit executeCommand();
 }
-
 
 void MainWindow::on_restoreButton_clicked()
 {
+    if(!spinover)
+    {
+        QMessageBox::information(this, "提示","请等待动画结束。");
+        return;
+    }
     initVertices();
-    opengl_showCube();
     this->reduction = true;           // 代表魔方已还原
     ui->infoLabel->clear();
     ui->moveLabel->clear();
+    this->bdc = nullptr;
+    opengl_showCube();
 }
 
 void MainWindow::spinOverDeal()
 {
     ui->infoLabel->clear();
     ui->moveLabel->clear();
+    this->spinover = true;
 }

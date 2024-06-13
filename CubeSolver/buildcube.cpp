@@ -5,7 +5,9 @@ QSet<int> allIndex;
 BuildCube::BuildCube(QWidget *parent, float *arr)
     : QOpenGLWidget(parent), xRot(0.0f), yRot(0.0f), zRot(0.0f), m_key(-794)
 {
-
+    this->m_command = "";
+    this->commandQueue.clear();
+    // 初始化魔方色块界面
     for(int i = 0; i < 5184; i++)
     {
         this->vertices[i] = arr[i];
@@ -278,20 +280,69 @@ void BuildCube::timerEvent(QTimerEvent *event)
 
 void BuildCube::rotateCube(QString mv)
 {
-    cout <<" receive ok" <<endl;
+    // 命令入队
     commandQueue.enqueue(mv);
-
-    if(m_command.isEmpty())
-    {
-        processNextCommand();
-    }
 }
 
+void BuildCube::execCommand()
+{
+    m_command.clear();
+    processNextCommand();
+}
+
+void BuildCube::clearCommend()
+{
+    this->commandQueue.clear();
+    this->m_command.clear();
+}
+
+void BuildCube::processNextCommand()
+{
+    if(commandQueue.isEmpty())
+        return;
+
+    m_command = commandQueue.dequeue();
+    QChar pm = '\'';
+
+    // 查看旋转方式是否为逆时针
+    if(m_command.indexOf(pm) != -1)
+    {
+        m_anti = -1;
+    }else
+    {
+        m_anti = 1;
+    }
+
+    if(m_command.contains("R"))
+    {
+        ans = setList[RIGHT];
+    }else if(m_command.contains("F"))
+    {
+        ans = setList[FRONT];
+    }else if(m_command.contains("B"))
+    {
+        ans = setList[BACK];
+    }else if(m_command.contains("L"))
+    {
+        ans = setList[LEFT];
+    }else if(m_command.contains("U"))
+    {
+        ans = setList[UP];
+    }else if(m_command.contains("D"))
+    {
+        ans = setList[DOWN];
+    }else{
+        m_command.clear();
+        processNextCommand();
+        return;         // 屏蔽无关字符
+    }
+    startTimer(50);
+}
 
 void BuildCube::timerEvent(QTimerEvent *event)
 {
-    QThread::msleep(80);
-    cout << "timeevent is start!" <<endl;
+    QThread::msleep(50);
+
     static int m_count = 0;
     m_count++;
     if(m_command.contains("R"))
@@ -389,44 +440,4 @@ void BuildCube::timerEvent(QTimerEvent *event)
         emit spinOver();
 }
 
-void BuildCube::processNextCommand()
-{
-    if(commandQueue.isEmpty())
-        return;
 
-    m_command = commandQueue.dequeue();
-    QChar pm = '\'';
-    // 设置角度
-    if(m_command.indexOf(pm) != -1)
-    {
-        m_anti = -1;
-    }else
-    {
-        m_anti = 1;
-    }
-
-    if(m_command.contains("R"))
-    {
-        ans = setList[RIGHT];
-    }else if(m_command.contains("F"))
-    {
-        ans = setList[FRONT];
-    }else if(m_command.contains("B"))
-    {
-        ans = setList[BACK];
-    }else if(m_command.contains("L"))
-    {
-        ans = setList[LEFT];
-    }else if(m_command.contains("U"))
-    {
-        ans = setList[UP];
-    }else if(m_command.contains("D"))
-    {
-        ans = setList[DOWN];
-    }else{
-        m_command.clear();
-        processNextCommand();
-        return;         // 屏蔽无关字符
-    }
-    startTimer(10);
-}

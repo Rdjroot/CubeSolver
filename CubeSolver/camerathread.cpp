@@ -11,12 +11,12 @@ CameraThread::CameraThread()
 CameraThread::~CameraThread()
 {
     running = false;
-    wait();
+    wait();             // 等待所有线程任务结束
     if(cap.isOpened())
     {
         cap.release(); // 释放摄像头资源
     }
-    qDebug() <<"thread over!!";
+//    qDebug() <<"thread over!!";
 }
 
 // 停止线程运作
@@ -30,7 +30,7 @@ void CameraThread::stop()
 // 根据标志位向cubedetect传递信号和画面信息
 void CameraThread::run()
 {
-    qDebug() << "run start!" ;
+//    qDebug() << "run start!" ;
     cap.open(1);            // 开启的摄像头序列号
     if(!cap.isOpened())
     {
@@ -74,7 +74,7 @@ void CameraThread::run()
         // 线程休眠15毫秒
         QThread::msleep(15);
     }
-    qDebug() << "cap is release";
+//    qDebug() << "cap is release";
     cap.release();
 }
 

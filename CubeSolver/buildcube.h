@@ -41,6 +41,10 @@ public:
 public slots:
     void rotateCube(QString m);
 
+    void execCommand();
+
+    void clearCommend();
+
 protected:
     void initializeGL() override;
     void paintGL() override;

@@ -10,9 +10,6 @@ int main(int argc, char *argv[])
     // 注册 Mat 类型
     qRegisterMetaType<cv::Mat>("cv::Mat");
 
-//    MainWindow w;
-//    w.setWindowTitle("CubeSolver");
-//    w.show();
     Welcome w;
     w.setWindowTitle("CubeSolver");
     w.show();
