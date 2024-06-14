@@ -7,6 +7,7 @@ BuildCube::BuildCube(QWidget *parent, float *arr)
 {
     this->m_command = "";
     this->commandQueue.clear();
+    this->speed = 40;
     // 初始化魔方色块界面
     for(int i = 0; i < 5184; i++)
     {
@@ -284,9 +285,10 @@ void BuildCube::rotateCube(QString mv)
     commandQueue.enqueue(mv);
 }
 
-void BuildCube::execCommand()
+void BuildCube::execCommand(int speed)
 {
     m_command.clear();
+    this->speed = speed;
     processNextCommand();
 }
 
@@ -336,12 +338,12 @@ void BuildCube::processNextCommand()
         processNextCommand();
         return;         // 屏蔽无关字符
     }
-    startTimer(50);
+    startTimer(this->speed);
 }
 
 void BuildCube::timerEvent(QTimerEvent *event)
 {
-    QThread::msleep(50);
+    QThread::msleep(this->speed);
 
     static int m_count = 0;
     m_count++;

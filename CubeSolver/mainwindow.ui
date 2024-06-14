@@ -812,7 +812,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>关闭展示</string>
+     <string>展示/关闭魔方</string>
     </property>
    </widget>
    <widget class="QPushButton" name="startSolveButton">
@@ -825,7 +825,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>动画演示</string>
+     <string>还原动画</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_4">
@@ -889,7 +889,7 @@ font: 36pt &quot;黑体&quot;;</string>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="ansLabel"/>
+      <widget class="QLineEdit" name="ansLine"/>
      </item>
     </layout>
    </widget>
@@ -911,7 +911,7 @@ font: 36pt &quot;黑体&quot;;</string>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="inputLabel"/>
+      <widget class="QLineEdit" name="inputLine"/>
      </item>
     </layout>
    </widget>

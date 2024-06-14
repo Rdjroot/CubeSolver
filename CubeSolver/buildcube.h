@@ -41,7 +41,7 @@ public:
 public slots:
     void rotateCube(QString m);
 
-    void execCommand();
+    void execCommand(int speed);
 
     void clearCommend();
 
@@ -67,6 +67,7 @@ private:
 
 private:
     void processNextCommand();
+    int speed;
 signals:
     void sendMoveLabel(QString m);
 

@@ -42,6 +42,7 @@ private:
     Ui::MainWindow *ui;
 
     bool spinover;
+    bool glShow;
 
     //當前魔方
     CubieCube ccb;
@@ -74,8 +75,11 @@ private:
     // 存储当前解法
     vector<string> answerLatex;
 
+    // 存储输入框
+    vector<string> inputLatex;
+
     // 互斥量，防止動畫覆蓋
-    QMutex qmtx;
+    QMutex qmtx, cqmtx;
 
 private slots:
     // 打开识别窗口
@@ -109,7 +113,7 @@ private slots:
     void showMoveLabel(QString m);
 
     // 需要轉動的隊列
-    void spinCubeAction(vector<string> moves);
+    void spinCubeAction(vector<string> moves, int speed);
 
     // 復原3D魔方
     void on_restoreButton_clicked();
@@ -136,6 +140,10 @@ private:
     // 显示opengl窗口
     void opengl_showCube();
 
+    void constructByColor();
+
+    void constructByLatex(QString inputInfo);
+
 protected:
     // 窗口关闭，释放对象
     void closeEvent(QCloseEvent *event) override;
@@ -149,11 +157,11 @@ signals:
 
     void sendStrToCube(QString m);
 
-    void spinCube(vector<string> moves);
+    void spinCube(vector<string> moves, int spped);
 
     void clearQueue();
 
-    void executeCommand();
+    void executeCommand(int speed);
 };
 
 #endif // MAINWINDOW_H

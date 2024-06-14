@@ -23,6 +23,7 @@ Welcome::~Welcome()
     {
         mw->close();
         mw->deleteLater();
+        mw = nullptr;
     }
     solver = nullptr;
     delete ui;
@@ -87,5 +88,11 @@ void Welcome::on_scanUsing_clicked()
 
 void Welcome::mwClose()
 {
+    if(this->mw != nullptr)
+    {
+        mw->close();
+        mw->deleteLater();
+        mw = nullptr;
+    }
     this->show();
 }

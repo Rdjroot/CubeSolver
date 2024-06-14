@@ -482,7 +482,7 @@ void Solver::searchPartTwo(int cp, int eundp, int emp, int curDepth, vector<int>
         if (cp == 0 && eundp == 0 && emp == 0)
         {
             finishFlag = 1;
-            // 查找三次解法，并获取最短的那一个
+            // 查找五次解法，并获取最短的那一个
             if (result.empty() || result.size() >= steps.size())
             {
                 this->answercount++;
@@ -604,6 +604,7 @@ void Solver::searchPartOne(int twist, int flip, int slice, int curDepth, vector<
 // 获取还原公式
 vector<string> Solver::getSolveLatex(CubieCube originCube)
 {
+    // 从三个答案中选择最小的
     this->answercount = 3;
     this->orgccb = originCube;
     initCco = encodeCornerO(originCube);

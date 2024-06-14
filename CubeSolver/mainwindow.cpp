@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     solver = Solver::getInstance();
     this->spinover = true;
+    this->glShow = true;
 
     // 设置背景图
     QPalette palette;
@@ -71,8 +72,6 @@ MainWindow::~MainWindow()
 // 打开摄像头
 void MainWindow::on_openCameraButton_clicked()
 {
-    if(!spinover)
-        return;
     emit hideCube();
     if (rcb == nullptr) {
         rcb = new cubeDetect();
@@ -480,31 +479,99 @@ void MainWindow::drawingCubeColor()
     }
 }
 
-// 展示3D魔方
+// 构建3D魔方
 void MainWindow::on_constructButton_clicked()
 {
     if(!spinover)
-        return;
-    // 判断是否有识别的颜色
-    if(this->ruckCube.size() == 6)
     {
-        // 构造魔方
-        CubieCube cforccb(this->ruckCube);
-        if(!cforccb.checkValid())
-        {
-            QMessageBox::information(this, "提示", "识别出的魔方非法，展现原始魔方。");
-            initVertices();
-        }else{
-            this->ccb = cforccb;
-            drawingCubeColor();
+        QMessageBox::information(this, "提示","动画进行中，请耐心等待");
+        return;
+    }
 
-            // 将魔方置为非还原状态
-            this->reduction = false;
+    if(this->reduction == false)
+    {
+        QMessageBox::information(this,"提示","魔方已构建，请先动画还原或重置后再构建。");
+        return;
+    }
+    // 构造
+    cqmtx.lock();
+    initVertices();
+    opengl_showCube();
+
+    QString inputInfo = ui->inputLine->text();
+    if(this->ruckCube.size() == 6 && inputInfo.size() > 0)
+    {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("选择");
+        msgBox.setText("同时检测到视觉数据和打乱公式，\n请选择其中一项作为魔方构造的方式。\n注意：选择颜色构造，将清空公式输入框。");
+        QPushButton *conByColor = msgBox.addButton("颜色构造", QMessageBox::ActionRole);
+        QPushButton *conByLatex = msgBox.addButton("公式构造", QMessageBox::ActionRole);
+        msgBox.exec();
+
+        if(msgBox.clickedButton() == conByColor)
+        {
+            constructByColor();
+        }else if(msgBox.clickedButton() == conByLatex)
+        {
+            constructByLatex(inputInfo);
         }
-    }else{
+    }else if(inputInfo.size() > 0)
+    {
+        constructByLatex(inputInfo);
+    }else if(this->ruckCube.size() == 6){
+        constructByColor();
+    }
+
+    cqmtx.unlock();
+}
+
+void MainWindow::constructByColor()
+{
+    ui->inputLine->clear();
+    ui->ansLine->clear();
+    // 构造魔方
+    CubieCube cforccb(this->ruckCube);
+    if(!cforccb.checkValid())
+    {
+        QMessageBox::information(this, "提示", "识别出的魔方非法，展现原始魔方。");
         initVertices();
+    }else{
+        this->ccb = cforccb;
+        drawingCubeColor();
+        // 将魔方置为非还原状态
+        this->reduction = false;
     }
     opengl_showCube();
+}
+
+void MainWindow::constructByLatex(QString inputInfo)
+{
+    // 获取打乱公式
+    std::istringstream iss(inputInfo.toStdString());
+    this->inputLatex.clear();
+    string str;
+    while(iss >> str)
+    {
+        if(moveMap.find(str) == moveMap.end())
+        {
+            // 校验输入内容是否合法
+            QMessageBox::information(this,"提示", "输入不规范，请重试。");
+            this->inputLatex.clear();
+            return;
+        }
+        this->inputLatex.push_back(str);
+    }
+
+    if(!this->inputLatex.empty())
+    {
+        this->ccb = CubieCube(this->inputLatex);
+        qmtx.lock();
+        // 通过latex进行旋转
+        emit spinCube(this->inputLatex, 30);
+        this->reduction = false;        // 魔方非还原状态
+        ui->infoLabel->setText("正在\n打乱\n魔方\n请稍后\n");
+        qmtx.unlock();
+    }
 }
 
 void MainWindow::opengl_showCube()
@@ -545,9 +612,8 @@ void MainWindow::opengl_showCube()
     ui->openGLWidget->setLayout(layout);
 
     ui->openGLWidget->show();
-//    bdc->setFocus();
+    this->glShow = true;
 }
-
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -574,75 +640,36 @@ void MainWindow::on_pushButton_4_clicked()
 
 void MainWindow::on_solveButton_clicked()
 {
-    if(!spinover)
+    if(this->reduction == true)
+    {
+        QMessageBox::information(this, "提示", "未检测到需求解数据，请先构建魔方。");
         return;
-
-    ui->ansLabel->clear();
-    QString inputInfo = ui->inputLabel->text();
-    bool gotAns = false;
-    // 如果非还原状态：直接求解
-    if(this->reduction == false)
-    {
-        if(inputInfo.size() != 0)
-        {
-            QMessageBox::information(this, "提示", "需要对打乱公式求解请先还原魔方，否则请清空打乱公式");
-        }else{
-            this->answerLatex = solver->getSolveLatex(this->ccb);
-            gotAns = true;
-        }
     }
-    else
+    this->answerLatex.clear();
+    this->answerLatex = solver->getSolveLatex(this->ccb);
+    // 旋转完再给出公式
+    QString ans;
+    for(auto a: answerLatex)
     {
-        // 获取打乱公式
-        std::istringstream iss(inputInfo.toStdString());
-        vector<string> latex;
-        string str;
-        bool check = true;
-        while(iss >> str)
-        {
-            if(moveMap.find(str) == moveMap.end())
-            {
-                // 校验输入内容是否合法
-                QMessageBox::information(this,"提示", "输入不规范，请重试。");
-                check = false;
-                break;
-            }
-            latex.push_back(str);
-        }
-
-        if(check && !latex.empty())
-        {
-            this->ccb = CubieCube(latex);
-            // 获取求解公式
-            this->answerLatex = solver->getSolveLatex(this->ccb);
-            gotAns = true;
-            qmtx.lock();
-            // 通过latex进行旋转
-            emit spinCube(latex);
-            this->reduction = false;        // 魔方非还原状态
-            ui->infoLabel->setText("正在\n打乱\n魔方\n请稍后\n");
-            qmtx.unlock();
-        }
+        ans.append(QString::fromStdString(a));
+        ans.append(" ");
     }
-
-    if(gotAns)
-    {
-        // 旋转完再给出公式
-        QString ans;
-        for(auto a: answerLatex)
-        {
-            ans.append(QString::fromStdString(a));
-            ans.append(" ");
-        }
-        // 展示结果
-        ui->ansLabel->setText(ans);
-    }
+    // 展示结果
+    ui->ansLine->setText(ans);
 }
 
-// 关闭展示
+// 关闭/打开展示
 void MainWindow::on_closeShowButton_clicked()
 {
-    ui->openGLWidget->hide();
+    if(glShow)
+    {
+        ui->openGLWidget->hide();
+        glShow = false;
+    }else{
+        ui->openGLWidget->show();
+        glShow = true;
+    }
+
 }
 
 // 调试代码
@@ -669,18 +696,22 @@ void MainWindow::on_startSolveButton_clicked()
         QMessageBox::information(this, "提示","请等待动画结束。");
         return;
     }
-
-    if(this->reduction == false){
-        qmtx.lock();
-        vector<string> &ans = this->answerLatex;
-        emit spinCube(ans);
-        qmtx.unlock();
-        this->reduction = true;             // 代表魔方已还原
-    }else
+    if(this->reduction)
     {
         QMessageBox::information(this, "提示", "魔方已回到还原状态。");
+        return;
+    }
+    if(this->answerLatex.empty())
+    {
+        QMessageBox::information(this,"提示","未获取求解公式，请先求解");
+        return;
     }
 
+    qmtx.lock();
+    vector<string> &ans = this->answerLatex;
+    emit spinCube(ans, 40);
+    qmtx.unlock();
+    this->reduction = true;             // 代表魔方已还原
 }
 
 void MainWindow::showMoveLabel(QString m)
@@ -688,7 +719,7 @@ void MainWindow::showMoveLabel(QString m)
     ui->moveLabel->setText(m);
 }
 
-void MainWindow::spinCubeAction(vector<string> moves)
+void MainWindow::spinCubeAction(vector<string> moves, int speed)
 {
     this->spinover = false;
     for(auto s: moves)
@@ -703,9 +734,10 @@ void MainWindow::spinCubeAction(vector<string> moves)
             QThread::msleep(10); // 添加10毫秒的延迟
         }
     }
-    emit executeCommand();
+    emit executeCommand(speed);
 }
 
+// 复原
 void MainWindow::on_restoreButton_clicked()
 {
     if(!spinover)
@@ -713,11 +745,15 @@ void MainWindow::on_restoreButton_clicked()
         QMessageBox::information(this, "提示","请等待动画结束。");
         return;
     }
-    initVertices();
-    this->reduction = true;           // 代表魔方已还原
     ui->infoLabel->clear();
     ui->moveLabel->clear();
-    this->bdc = nullptr;
+    ui->inputLine->clear();
+    ui->ansLine->clear();
+    this->ruckCube.clear();
+    this->inputLatex.clear();
+    this->answerLatex.clear();
+    this->reduction = true;           // 代表魔方已还原
+    initVertices();
     opengl_showCube();
 }
 
