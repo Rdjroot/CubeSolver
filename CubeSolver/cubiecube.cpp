@@ -1,4 +1,34 @@
 #include "cubiecube.h"
+
+unordered_map<string, int> moveMap = {
+    {"U",0},{"U2",1},{"U'",2},
+    {"D",3},{"D2",4},{"D'",5},
+    {"L",6},{"L2",7},{"L'",8},
+    {"R",9},{"R2",10},{"R'",11},
+    {"F",12},{"F2",13},{"F'",14},
+    {"B",15},{"B2",16},{"B'",17},
+};
+
+unordered_map<int, string> stepMap = { {0,"U"},{1,"U2"},{2,"U'"},
+    {3,"D"},{4,"D2"},{5,"D'"},
+    {6,"L"},{7,"L2"},{8,"L'"},
+    {9,"R"},{10,"R2"},{11,"R'"},
+    {12,"F"},{13,"F2"},{14,"F'"},
+    {15,"B"},{16,"B2"},{17,"B'"},
+};
+
+unordered_map<string, char> colorUpper = { {"yellow",'Y'},
+    {"white",'W'},
+    {"blue",'B'},
+    {"red",'R'},
+    {"green",'G'},
+    {"orange",'O'}
+};
+
+unordered_map<string, Corner> clToCrn = { { "BRY", URF},  { "BOY", UFL},  { "GOY", ULB},  { "GRY", UBR},  { "BRW", DFR},  { "BOW", DLF},  { "GOW", DBL},  { "GRW", DRB} };
+
+unordered_map<string, Edge> clToEdg = { { "RY", UR},  { "BY", UF},  { "OY", UL},  { "GY", UB},  { "RW", DR},  { "BW", DF},  { "OW", DL},  { "GW", DB},  { "BR", FR},  { "BO", FL},  { "GO", BL},  { "GR", BR} };
+
 // 未定义魔方
 CubieCube::CubieCube()
 {
