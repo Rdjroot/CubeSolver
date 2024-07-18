@@ -1,0 +1,5 @@
+﻿  testMain.cpp
+F:\CubeSolver-Cpp\Code\algorithm\Cube_Algorithm\Solver.h(11,9): warning C4067: 预处理器指令后有意外标记 - 应输入换行符
+  (编译源文件“testMain.cpp”)
+  
+  Cube_Algorithm.vcxproj -> F:\CubeSolver-Cpp\Code\algorithm\Cube_Algorithm\x64\Debug\Cube_Algorithm.exe

@@ -85,11 +85,13 @@ CubeSolver/
 
 ## 开发指南
 
-[三阶魔方基础知识](./Documents/三阶魔方知识.md)
+[使用OpenCV识别魔方颜色](./Documents/博客/魔方色块识别.md)（完成）
 
-[还原算法](./Documents/魔方还原算法.md)
+[三阶魔方基础知识](./Documents/三阶魔方知识.md)（未完成）
 
-[界面与识别魔方](./Documents/界面与魔方识别.md)
+[还原算法](./Documents/魔方还原算法.md)（未完成）
+
+[界面与识别魔方](./Documents/界面与魔方识别.md)（未完成）
 
 ## 迭代日志
 

@@ -1,3 +1,10 @@
+/*
+ * @Author: Rdjroot
+ * @Date: 2024-06-03 22:51:23
+ * @LastEditors: Rdjroot
+ * @LastEditTime: 2024-06-20 18:30:09
+ * @FilePath: \CplusplusPracticef:\CubeSolver-Cpp\Code\algorithm\Cube_Algorithm\testMain.cpp
+ */
 #include "CubieCube.h"
 #include "Solver.h"
 #include<sstream>
@@ -8,28 +15,28 @@ int main()
 {
 	Solver* s = Solver::getInstance();
 	cout << "init table finish" << endl;
-	//string input;
-	//vector<string> latex;
-	//cout << "Please input: ";
-	//std::getline(std::cin, input);		// 将一行输入存储到input中
+	string input;
+	vector<string> latex;
+	cout << "Please input: ";
+	std::getline(std::cin, input);		// 将一行输入存储到input中
 
-	//std::istringstream iss(input);		// 创建istring流，并将input拷贝过去		
-	//string str;
-	//while (iss >> str)					// istring流将通过空格进行拆分，传递赋值给str		
-	//{
-	//	latex.push_back(str);
-	//}
-	unordered_map < string, vector<string>> ruckCube = { { "yellow", { "white", "white", "yellow", "green", "yellow", "orange", "blue", "green", "green", }},
-{ "orange", { "blue", "white", "yellow", "red", "orange", "blue", "green", "red", "yellow", }},
-{ "red", { "yellow", "yellow", "blue", "green", "red", "red", "white", "orange", "blue", }},
-{ "green", { "red", "blue", "red", "green", "green", "white", "white", "white", "white", }},
-{ "white", { "red", "red", "red", "blue", "white", "blue", "orange", "orange", "orange", }},
-{ "blue", { "orange", "orange", "orange", "yellow", "blue", "yellow", "green", "yellow", "green", }} };
+	std::istringstream iss(input);		// 创建istring流，并将input拷贝过去		
+	string str;
+	while (iss >> str)					// istring流将通过空格进行拆分，传递赋值给str		
+	{
+		latex.push_back(str);
+	}
+// 	unordered_map < string, vector<string>> ruckCube = { { "yellow", { "white", "white", "yellow", "green", "yellow", "orange", "blue", "green", "green", }},
+// { "orange", { "blue", "white", "yellow", "red", "orange", "blue", "green", "red", "yellow", }},
+// { "red", { "yellow", "yellow", "blue", "green", "red", "red", "white", "orange", "blue", }},
+// { "green", { "red", "blue", "red", "green", "green", "white", "white", "white", "white", }},
+// { "white", { "red", "red", "red", "blue", "white", "blue", "orange", "orange", "orange", }},
+// { "blue", { "orange", "orange", "orange", "yellow", "blue", "yellow", "green", "yellow", "green", }} };
 	auto start = std::chrono::high_resolution_clock::now();
 	//
 
-	CubieCube originCube(ruckCube);
-	originCube.print();
+	CubieCube originCube(latex);
+	// originCube.print();
 
 	vector<string> answer = s->getSolveLatex(originCube);
 	auto end = std::chrono::high_resolution_clock::now();
