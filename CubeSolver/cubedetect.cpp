@@ -204,7 +204,7 @@ void cubeDetect::MatToQImage()
     try{
         if(this->myImg.channels() == 3)
         {
-            cv::cvtColor(this->myImg, rgb, CV_BGR2RGB);
+            cv::cvtColor(this->myImg, rgb, cv::COLOR_BGR2RGB);
             img = QImage((const uchar*)(rgb.data), rgb.cols, rgb.rows, rgb.cols * rgb.channels(), QImage::Format_RGB888);
         }
         else

@@ -5,6 +5,13 @@ QSet<int> allIndex;
 BuildCube::BuildCube(QWidget *parent, float *arr)
     : QOpenGLWidget(parent), xRot(0.0f), yRot(0.0f), zRot(0.0f), m_key(-794)
 {
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    format.setVersion(3, 3);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setRenderableType(QSurfaceFormat::OpenGL);
+    setFormat(format);
+
     this->m_command = "";
     this->commandQueue.clear();
     this->speed = 40;
@@ -69,61 +76,97 @@ BuildCube::BuildCube(QWidget *parent, float *arr)
 BuildCube::~BuildCube()
 {
     makeCurrent();
+    VAO.destroy();
     VBO.destroy();
     delete program;
 }
 
 void BuildCube::initializeGL()
 {
-    // 为当前环境初始化OpenGL函数
     initializeOpenGLFunctions();
 
-    // 启用深度测试
+    qInfo() << "BuildCube initializeGL context"
+            << QOpenGLContext::currentContext()
+            << "format" << context()->format().majorVersion() << context()->format().minorVersion()
+            << "size" << size();
+
     glEnable(GL_DEPTH_TEST);
 
-    // 创建着色器程序
     program = new QOpenGLShaderProgram;
-    program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shapes.vert");
-    program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shapes.frag");
-
-    program->link();
+    if (!program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shapes.vert"))
+    {
+        qCritical() << "Vertex shader load failed" << program->log();
+        return;
+    }
+    if (!program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shapes.frag"))
+    {
+        qCritical() << "Fragment shader load failed" << program->log();
+        return;
+    }
+    if (!program->link())
+    {
+        qCritical() << "Shader link failed" << program->log();
+        return;
+    }
     program->bind();
 
     QMatrix4x4 model;
-    model.perspective(45.0f, (GLfloat)width()/(GLfloat)height(), 0.1f, 100.0f);
+    model.perspective(45.0f, static_cast<GLfloat>(width()) / static_cast<GLfloat>(qMax(1, height())), 0.1f, 100.0f);
     model.translate(0, 0, translate);
     model.rotate(30, 1.0, 0.0, 0.0);
     model.rotate(-30, 0.0, 1.0, 0.0);
     program->setUniformValue("model", model);
 
-    VBO.create();//在OpenGL服务器中创建了缓存对象 缓存gpu
-    VBO.bind();//将与该对象相关联的缓存绑定到当前OpenGL环境
-    //在缓存中为数组分配空间并将缓存初始化为数组的内容
+    for (QMatrix4x4 &matrixItem : matrix)
+    {
+        matrixItem.setToIdentity();
+    }
 
-//    qDebug() <<" 1111 "<< sizeof(vertices);
+    VAO.create();
+    VAO.bind();
+
+    VBO.create();
+    VBO.bind();
     VBO.allocate(this->vertices, sizeof(this->vertices));
 
     GLuint vPosition = program->attributeLocation("vPosition");
-    //1.为着色器中location位置的变量设置顶点缓存 3.缓存中要使用数据的偏移值 4.每个顶点需要更新的分量数目
-    //5.数组中每两个元素之间的大小偏移值
-    program->setAttributeBuffer(vPosition, GL_FLOAT, 0, 3, 6*sizeof(GL_FLOAT));
-    glEnableVertexAttribArray(vPosition);
+    program->enableAttributeArray(vPosition);
+    program->setAttributeBuffer(vPosition, GL_FLOAT, 0, 3, 6 * sizeof(GL_FLOAT));
 
-    //1.起始位置offset 3.写入字节数
     GLuint vColor = program->attributeLocation("aColor");
-    program->setAttributeBuffer(vColor, GL_FLOAT, 3*sizeof(GL_FLOAT), 3, 6*sizeof(GL_FLOAT));
-    glEnableVertexAttribArray(vColor);
+    program->enableAttributeArray(vColor);
+    program->setAttributeBuffer(vColor, GL_FLOAT, 3 * sizeof(GL_FLOAT), 3, 6 * sizeof(GL_FLOAT));
+
+    VAO.release();
+    VBO.release();
 }
 
 void BuildCube::paintGL()
 {
+    if (program == nullptr || !program->isLinked())
+    {
+        qWarning() << "paintGL skipped because shader program is not ready";
+        return;
+    }
+
+    static bool firstPaint = true;
+    if (firstPaint)
+    {
+        qInfo() << "BuildCube paintGL first frame";
+        firstPaint = false;
+    }
+
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for(int i=0; i<54; i++) {// 绘制
+    program->bind();
+    VAO.bind();
+    for(int i=0; i<54; i++) {
         program->setUniformValue("matrix", matrix[i]);
         glDrawArrays(GL_TRIANGLE_FAN, i*4, 4);
     }
+    VAO.release();
+    program->release();
 }
 
 void BuildCube::resizeGL(int, int){}

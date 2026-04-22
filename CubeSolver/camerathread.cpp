@@ -50,7 +50,7 @@ void CameraThread::run()
     * M J P G 表示Motion JPEG编码格式
     * 将每一帧视频压缩为一个JPEG图像
     */
-    cap.set(CV_CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
+    cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
     cv::Mat frame;
     while(running)
     {

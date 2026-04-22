@@ -789,7 +789,7 @@
      <string>求解</string>
     </property>
    </widget>
-   <widget class="QOpenGLWidget" name="openGLWidget">
+   <widget class="QWidget" name="openGLWidget">
     <property name="enabled">
      <bool>true</bool>
     </property>

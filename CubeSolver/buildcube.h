@@ -7,10 +7,13 @@
 #include <QOpenGLBuffer>
 #include <QOpenGLTexture>
 #include <QOpenGLShaderProgram>
+#include <QOpenGLVertexArrayObject>
 #include <QKeyEvent>
 #include <QVector>
 #include <QVector3D>
-#include <QSet>
+#include <QOpenGLContext>
+#include <QSurfaceFormat>
+#include <QLoggingCategory>
 #include<iostream>
 #include <QQueue>
 #include<QThread>
@@ -56,6 +59,7 @@ private:
     Ui::BuildCube *ui;
     QOpenGLShaderProgram *program;
     QOpenGLBuffer VBO;
+    QOpenGLVertexArrayObject VAO;
     GLfloat translate, xRot, yRot, zRot;
     int m_key;
     QSet<int> setList[6];

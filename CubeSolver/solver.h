@@ -10,7 +10,7 @@
 #include<set>
 #include<chrono>
 #include<iostream>
-#include<cmath>;
+#include<cmath>
 #include<memory>
 using std::cin;
 using std::endl;

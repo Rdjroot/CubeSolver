@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 设置背景图
     QPalette palette;
-    palette.setBrush(QPalette::Background,QBrush(QPixmap(":/Resource/grey.jpeg")));
+    palette.setBrush(QPalette::Window, QBrush(QPixmap(":/Resource/grey.jpeg")));
     this->setPalette(palette);
 
     // 調試代碼隱藏
@@ -576,43 +576,46 @@ void MainWindow::constructByLatex(QString inputInfo)
 
 void MainWindow::opengl_showCube()
 {
-    // bdc根据当前颜色数组构造魔方
-    bdc = make_shared<BuildCube>(nullptr, this->vertices);
-
-    // 旋转字符 -> 旋转动作
-    connect(this, &MainWindow::sendStrToCube, bdc.get(), &BuildCube::rotateCube);
-
-    // 当前旋转动作-> 旋转字符
-    connect(bdc.get(), &BuildCube::sendMoveLabel, this, &MainWindow::showMoveLabel);
-
-    // 旋转完成 -> 确认
-    connect(bdc.get(), &BuildCube::spinOver, this,&MainWindow::spinOverDeal);
-
-    connect(this, &MainWindow::executeCommand, bdc.get(), &BuildCube::execCommand);
-
-    // 将opengl图像放到布局中
-    QVBoxLayout *layout = new QVBoxLayout();
-    layout->addWidget(bdc.get());
-
-    // 删除旧的布局（如果有）
-    if (ui->openGLWidget->layout() != nullptr)
+    if (ui->openGLWidget->layout() == nullptr)
     {
-        QLayoutItem* item;
-        while ((item = ui->openGLWidget->layout()->takeAt(0)) != nullptr)
-        {
-            if (item->widget() != nullptr)
-            {
-                item->widget()->deleteLater(); // 使用 deleteLater 而不是 delete
-            }
-            delete item;
-        }
-        delete ui->openGLWidget->layout();
+        auto *layout = new QVBoxLayout(ui->openGLWidget);
+        layout->setContentsMargins(0, 0, 0, 0);
+        ui->openGLWidget->setLayout(layout);
     }
 
-    ui->openGLWidget->setLayout(layout);
+    auto *layout = qobject_cast<QVBoxLayout *>(ui->openGLWidget->layout());
+    if (layout == nullptr)
+    {
+        qWarning() << "OpenGL container layout is invalid";
+        return;
+    }
 
+    while (QLayoutItem *item = layout->takeAt(0))
+    {
+        if (QWidget *widget = item->widget())
+        {
+            widget->deleteLater();
+        }
+        delete item;
+    }
+
+    bdc = make_unique<BuildCube>(ui->openGLWidget, this->vertices);
+    bdc->setObjectName("buildCubeWidget");
+    bdc->setMinimumSize(ui->openGLWidget->size());
+    bdc->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    connect(this, &MainWindow::sendStrToCube, bdc.get(), &BuildCube::rotateCube);
+    connect(bdc.get(), &BuildCube::sendMoveLabel, this, &MainWindow::showMoveLabel);
+    connect(bdc.get(), &BuildCube::spinOver, this, &MainWindow::spinOverDeal);
+    connect(this, &MainWindow::executeCommand, bdc.get(), &BuildCube::execCommand);
+
+    layout->addWidget(bdc.get());
     ui->openGLWidget->show();
+    bdc->show();
+    bdc->update();
     this->glShow = true;
+
+    qInfo() << "BuildCube widget attached" << bdc->size() << "container" << ui->openGLWidget->size();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

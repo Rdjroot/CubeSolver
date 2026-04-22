@@ -51,7 +51,7 @@ private:
     cubeDetect *rcb;
 
     // 构建3D魔方
-    shared_ptr<BuildCube> bdc;
+    unique_ptr<BuildCube> bdc;
 
     // 求解
     shared_ptr<Solver> solver;
