@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run CubeSolver",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake-mingw/CubeSolver.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [
+        {
+          "name": "PATH",
+          "value": "D:/IDEs/QT/Tools/mingw1120_64/bin;${env:PATH}"
+        }
+      ],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "D:/IDEs/QT/Tools/mingw1120_64/bin/gdb.exe",
+      "preLaunchTask": "cmake-build-debug"
+    }
+  ]
+}

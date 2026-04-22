@@ -614,8 +614,6 @@ void MainWindow::opengl_showCube()
     bdc->show();
     bdc->update();
     this->glShow = true;
-
-    qInfo() << "BuildCube widget attached" << bdc->size() << "container" << ui->openGLWidget->size();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
