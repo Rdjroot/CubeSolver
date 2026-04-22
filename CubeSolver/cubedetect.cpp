@@ -1,4 +1,4 @@
-#include "cubedetect.h"
+﻿#include "cubedetect.h"
 #include "ui_cubedetect.h"
 
 cubeDetect::cubeDetect(QWidget *parent) :
@@ -74,8 +74,6 @@ void cubeDetect::closeEvent(QCloseEvent *event)
     emit cbdExitWin();
 }
 
-
-
 void cubeDetect::on_saveButton_clicked()
 {
     // 判断是否获取到了数据
@@ -100,7 +98,6 @@ void cubeDetect::on_startButton_clicked()
     mtx->lock();
     emit changeFlag(true);
     mtx->unlock();
-
 }
 
 void cubeDetect::on_pauseButton_clicked()

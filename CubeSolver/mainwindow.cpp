@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "cubedetect.h"
 
@@ -26,8 +26,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->reduction = true;            // 是否为还原状态
 
     solver = Solver::getInstance();
-    this->spinover = true;
-    this->glShow = true;
+    this->spinover = true;          // 动画旋转是否完成
+    this->glShow = true;            // opengl窗体是否显示
 
     // 设置背景图
     QPalette palette;
@@ -633,7 +633,7 @@ void MainWindow::on_pushButton_4_clicked()
             {
                cout << "\""<< inf <<"\", ";
             }
-            cout <<"}}, " <<endl;
+            // cout <<"}}, " <<endl;
         }
     }
 }

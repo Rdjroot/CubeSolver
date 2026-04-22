@@ -1,4 +1,4 @@
-#ifndef SOLVER_H
+﻿#ifndef SOLVER_H
 #define SOLVER_H
 
 #include<unordered_map>
@@ -122,7 +122,6 @@ private:
 private:
     // 构造函数
     Solver();
-
 };
 
 #endif // SOLVER_H

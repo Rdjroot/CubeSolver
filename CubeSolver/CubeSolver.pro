@@ -3,6 +3,10 @@ QT       += core gui opengl
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
+msvc{
+    QMAKE_CFLAGS += /utf-8
+    QMAKE_CXXFLAGS += /utf-8
+}
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -38,9 +42,10 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-# 本地opencv目录
+# 本地opencv目录，如果是MSVC编译请添加lib库
 INCLUDEPATH += E:\openCV\opencv3410\opencv\opencv-build\install\include
-LIBS += E:\openCV\opencv3410\opencv\opencv-build\lib\libopencv_*.a
+LIBS += E:\openCV\opencv3410\opencv\opencv-build\lib\libopencv_*.a \
+        E:\openCV\opencv3410\opencv\build\x64\vc15\lib\*.lib
 
 RESOURCES += \
     resource.qrc

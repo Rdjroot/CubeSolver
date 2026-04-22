@@ -46,10 +46,10 @@ color: rgb(255, 170, 127);
   <widget class="QTextBrowser" name="textBrowser">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>120</y>
+     <x>100</x>
+     <y>100</y>
      <width>401</width>
-     <height>81</height>
+     <height>121</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -61,8 +61,9 @@ color: rgb(255, 170, 127);
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt;快捷使用：输入标准打乱公式，获取还原公式&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;格式如下：&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;U' B' U2 L F2 R D2 L2 F2 L' D2 L2 B D' L2 D L' F' R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;格式如下：&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;R L U2 F U' D F2 R2 B2 L U2 F' B' U R2 D F2 U R2 U&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic; color:#aaaaff;&quot;&gt;PS：以上公式是Michael Reid于1995年发现的一种状态，该状态会使魔方乱序状态为最复杂的一种。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QTextBrowser" name="textBrowser_2">
@@ -117,7 +118,7 @@ color: rgb(168, 168, 168);</string>
     <string>©Rdjroot</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>40</x>
@@ -192,22 +193,11 @@ background-color: rgb(234, 234, 234);
     </item>
    </layout>
   </widget>
+  <zorder>layoutWidget</zorder>
   <zorder>textBrowser</zorder>
-  <zorder>pushButton</zorder>
   <zorder>textBrowser_2</zorder>
   <zorder>scanUsing</zorder>
-  <zorder>latexInput</zorder>
-  <zorder>label_2</zorder>
-  <zorder>latexOutput</zorder>
-  <zorder>label_3</zorder>
   <zorder>label_4</zorder>
-  <zorder>verticalSpacer</zorder>
-  <zorder>verticalSpacer_2</zorder>
-  <zorder>verticalSpacer_3</zorder>
-  <zorder>verticalSpacer_4</zorder>
-  <zorder>verticalSpacer_5</zorder>
-  <zorder>horizontalSpacer</zorder>
-  <zorder>horizontalSpacer_3</zorder>
   <zorder>label</zorder>
  </widget>
  <resources/>

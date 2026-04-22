@@ -5,7 +5,7 @@ std::shared_ptr<Solver> Solver::instance = nullptr;
 Solver::Solver()
 {
     // 最大步骤数
-    this->maxStep = 25;
+    this->maxStep = 22;
 
     this->move = initMove();
 
@@ -482,7 +482,7 @@ void Solver::searchPartTwo(int cp, int eundp, int emp, int curDepth, vector<int>
         if (cp == 0 && eundp == 0 && emp == 0)
         {
             finishFlag = 1;
-            // 查找五次解法，并获取最短的那一个
+            // 查找x次解法，并获取最短的那一个
             if (result.empty() || result.size() >= steps.size())
             {
                 this->answercount++;
@@ -563,7 +563,7 @@ void Solver::searchPartOne(int twist, int flip, int slice, int curDepth, vector<
                 if (finishFlag)
                     break;
                 searchPartTwo(ccp, ceudp, cemp, i, result, steps, finishFlag);
-                if (this->answercount < 3)
+                if (this->answercount < 1)
                     finishFlag = 0;
             }
         }
@@ -604,8 +604,7 @@ void Solver::searchPartOne(int twist, int flip, int slice, int curDepth, vector<
 // 获取还原公式
 vector<string> Solver::getSolveLatex(CubieCube originCube)
 {
-    // 从三个答案中选择最小的
-    this->answercount = 3;
+    this->answercount = 0;
     this->orgccb = originCube;
     initCco = encodeCornerO(originCube);
     initCeo = encodeEdgeO(originCube);

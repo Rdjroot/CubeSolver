@@ -1,4 +1,4 @@
-#include "welcome.h"
+﻿#include "welcome.h"
 #include "ui_welcome.h"
 
 Welcome::Welcome(QWidget *parent) :
@@ -9,6 +9,7 @@ Welcome::Welcome(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowIcon(QIcon(":/Resource/cubeIcon.png"));
+    // 设置背景图
     QPalette palette;
     palette.setBrush(QPalette::Background,QBrush(QPixmap(":/Resource/spinCube.jpg")));
     this->setPalette(palette);
@@ -81,7 +82,7 @@ void Welcome::on_scanUsing_clicked()
     {
         mw = new MainWindow();
     }
-    connect(mw,MainWindow::ExitWin,this,Welcome::mwClose);
+    connect(mw,&MainWindow::ExitWin,this,&Welcome::mwClose);
     mw->show();
     this->hide();
 }
