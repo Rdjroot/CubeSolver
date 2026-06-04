@@ -1,0 +1,94 @@
+name: Windows Package
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Build Windows package
+    runs-on: windows-latest
+
+    env:
+      BUILD_TYPE: Release
+      VCPKG_TARGET_TRIPLET: x64-windows
+      VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}\vcpkg-cache,readwrite
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Set up Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: 6.7.2
+          host: windows
+          target: desktop
+          arch: win64_msvc2019_64
+          cache: true
+
+      - name: Cache vcpkg binaries
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}\vcpkg-cache
+          key: vcpkg-${{ runner.os }}-${{ env.VCPKG_TARGET_TRIPLET }}-opencv4-${{ hashFiles('.github/workflows/windows-package.yml') }}
+          restore-keys: |
+            vcpkg-${{ runner.os }}-${{ env.VCPKG_TARGET_TRIPLET }}-opencv4-
+
+      - name: Locate vcpkg
+        shell: pwsh
+        run: |
+          if (-not $env:VCPKG_INSTALLATION_ROOT) {
+            $vcpkgExe = (Get-Command vcpkg).Source
+            $vcpkgRoot = Split-Path $vcpkgExe -Parent
+            "VCPKG_INSTALLATION_ROOT=$vcpkgRoot" | Out-File -FilePath $env:GITHUB_ENV -Append
+          }
+
+      - name: Install OpenCV
+        shell: pwsh
+        run: |
+          vcpkg install "opencv4[core,highgui,jpeg,png,tiff,quirc,thread,dshow]:$env:VCPKG_TARGET_TRIPLET"
+
+      - name: Configure CMake
+        shell: pwsh
+        run: |
+          cmake -S . -B build `
+            -G "Visual Studio 17 2022" `
+            -A x64 `
+            -DCMAKE_BUILD_TYPE="$env:BUILD_TYPE" `
+            -DCMAKE_PREFIX_PATH="$env:QT_ROOT_DIR" `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
+            -DVCPKG_TARGET_TRIPLET="$env:VCPKG_TARGET_TRIPLET" `
+            -DOpenCV_DIR="$env:VCPKG_INSTALLATION_ROOT\installed\$env:VCPKG_TARGET_TRIPLET\share\opencv4"
+
+      - name: Build
+        shell: pwsh
+        run: |
+          cmake --build build --config "$env:BUILD_TYPE" --parallel
+
+      - name: Prepare package
+        shell: pwsh
+        run: |
+          $packageName = "CubeSolver-windows-msvc2022-x64"
+          $sourceDir = Join-Path $PWD "build\$env:BUILD_TYPE"
+          $packageDir = Join-Path $PWD "package\$packageName"
+
+          if (!(Test-Path (Join-Path $sourceDir "CubeSolver.exe"))) {
+            throw "CubeSolver.exe was not found in $sourceDir"
+          }
+
+          New-Item -ItemType Directory -Force -Path $packageDir | Out-Null
+          Copy-Item -Path (Join-Path $sourceDir "*") -Destination $packageDir -Recurse -Force
+          Compress-Archive -Path $packageDir -DestinationPath "$packageDir.zip" -Force
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: CubeSolver-windows-msvc2022-x64
+          path: package/CubeSolver-windows-msvc2022-x64.zip

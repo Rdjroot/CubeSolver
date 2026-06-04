@@ -88,28 +88,37 @@ if(WIN32)
     get_filename_component(QT_BIN_DIR "${QT_QMAKE_EXECUTABLE}" DIRECTORY)
     find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QT_BIN_DIR}")
 
+    if(MINGW)
+        set(WINDEPLOYQT_COMPILER_RUNTIME_ARG --no-compiler-runtime)
+    else()
+        set(WINDEPLOYQT_COMPILER_RUNTIME_ARG --compiler-runtime)
+    endif()
+
     if(WINDEPLOYQT_EXECUTABLE)
         add_custom_command(TARGET CubeSolver POST_BUILD
             COMMAND "${WINDEPLOYQT_EXECUTABLE}"
-                --no-compiler-runtime
+                ${WINDEPLOYQT_COMPILER_RUNTIME_ARG}
                 --no-translations
                 "$<TARGET_FILE:CubeSolver>"
             COMMAND_EXPAND_LISTS
         )
     endif()
 
-    set(MINGW_RUNTIME_DLLS
-        "D:/IDEs/QT/Tools/mingw1120_64/bin/libgcc_s_seh-1.dll"
-        "D:/IDEs/QT/Tools/mingw1120_64/bin/libstdc++-6.dll"
-        "D:/IDEs/QT/Tools/mingw1120_64/bin/libwinpthread-1.dll"
-    )
+    if(MINGW)
+        get_filename_component(MINGW_BIN_DIR "${CMAKE_CXX_COMPILER}" DIRECTORY)
+        set(MINGW_RUNTIME_DLLS
+            "${MINGW_BIN_DIR}/libgcc_s_seh-1.dll"
+            "${MINGW_BIN_DIR}/libstdc++-6.dll"
+            "${MINGW_BIN_DIR}/libwinpthread-1.dll"
+        )
 
-    add_custom_command(TARGET CubeSolver POST_BUILD
-        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-            ${MINGW_RUNTIME_DLLS}
-            "$<TARGET_FILE_DIR:CubeSolver>"
-        COMMAND_EXPAND_LISTS
-    )
+        add_custom_command(TARGET CubeSolver POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+                ${MINGW_RUNTIME_DLLS}
+                "$<TARGET_FILE_DIR:CubeSolver>"
+            COMMAND_EXPAND_LISTS
+        )
+    endif()
 
     get_filename_component(OpenCV_INSTALLED_DIR "${OpenCV_DIR}/../.." ABSOLUTE)
     set(OpenCV_RUNTIME_DIR "${OpenCV_INSTALLED_DIR}/$<IF:$<CONFIG:Debug>,debug/bin,bin>")
